@@ -1,0 +1,479 @@
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f4f5f7;
+  --bg-input: #ffffff;
+  --border: #d8dbe0;
+  --text: #1d2129;
+  --text-muted: #6b7280;
+  --accent: #2f6fed;
+  --accent-text: #ffffff;
+  --danger: #c0392b;
+  --radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1e22;
+    --bg-soft: #24272c;
+    --bg-input: #191b1e;
+    --border: #3a3e45;
+    --text: #e6e8ea;
+    --text-muted: #9aa1ab;
+    --accent: #5b8dfa;
+    --accent-text: #10131a;
+    --danger: #ef6a5c;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Noto Sans TC", "Hiragino Sans", "Segoe UI", system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  /* The panel is as narrow as the user drags it, and the text it shows (endpoints, model
+     ids, LLM replies) contains tokens longer than that. */
+  overflow-wrap: anywhere;
+}
+
+rt {
+  font-size: 0.5em;
+  color: var(--text-muted);
+}
+
+button {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  cursor: pointer;
+  /* CJK labels break between any two characters, so a narrow row would split a label
+     mid-word instead of wrapping the button as a whole. */
+  white-space: nowrap;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+button.danger {
+  color: var(--danger);
+}
+
+input[type="text"],
+input[type="password"],
+textarea,
+select {
+  font: inherit;
+  width: 100%;
+  color: var(--text);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 5px 8px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* `flex: none` keeps the header out of the 45/55 split; sized by its own content, it
+   takes no height from the two scroll regions. */
+.panel__header {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Chrome, not an action: no fill and no border until it is hovered, at which point the
+   shared button hover rule supplies the accent outline. */
+.panel__settings {
+  padding: 2px 8px;
+  color: var(--text-muted);
+  background: none;
+  border-color: transparent;
+}
+
+.panel__settings:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.panel__top {
+  flex: 1 1 45%;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+
+.panel__bottom {
+  flex: 1 1 55%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-top: 1px solid var(--border);
+  padding: 10px 12px;
+}
+
+.section-title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.hint {
+  margin: 4px 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.error {
+  margin: 6px 0;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border-radius: var(--radius);
+}
+
+.source-text {
+  max-height: 26vh;
+  overflow-y: auto;
+  padding: 8px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  white-space: pre-wrap;
+}
+
+.ruby-preview {
+  min-height: 56px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-input);
+  white-space: pre-wrap;
+  cursor: text;
+}
+
+.ruby-preview--empty {
+  color: var(--text-muted);
+}
+
+.color-swatch {
+  width: 26px;
+  height: 22px;
+  padding: 0;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+}
+
+.color-swatch--active {
+  border-color: var(--text);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* These fields declare `width: 100%`, which as a flex base size would claim the whole line
+   and push every sibling button onto the next one. A small base lets them share the row,
+   and `min-width: 0` lets them shrink past the intrinsic width of an input/textarea. */
+.row > input,
+.row > textarea {
+  flex: 1 1 8em;
+  min-width: 0;
+}
+
+/* A select is as wide as its longest option, so filling the row leaves a band of empty
+   control next to one-word options like Low/Medium/High. It still shrinks when the row
+   runs out. */
+.row > select {
+  flex: 0 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
+/* A nested row is one group of controls (the colour swatches). Giving it the whole line
+   keeps the outer row's buttons together instead of wrapping through the middle of it. */
+.row > .row {
+  flex-basis: 100%;
+}
+
+.marker-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 18vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.marker-list__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  padding: 4px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.marker-list__item--active {
+  background: var(--bg-soft);
+  font-weight: 600;
+}
+
+.marker-list__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.chat-log {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.chat-msg {
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  white-space: pre-wrap;
+}
+
+.chat-msg--user {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.chat-msg__role {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Model markdown. Everything below is scoped to `.md` because the renderer emits bare
+   semantic elements, which the marker editor and the options form also use. */
+.md {
+  /* `.chat-msg` keeps `pre-wrap` for messages rendered as plain text; the lexer has already
+     turned this one's newlines into blocks, so honouring them again doubles every gap. */
+  white-space: normal;
+}
+
+.md > :first-child {
+  margin-top: 0;
+}
+
+.md > :last-child {
+  margin-bottom: 0;
+}
+
+.md p,
+.md ul,
+.md ol,
+.md blockquote,
+.md pre,
+.md table {
+  margin: 0.5em 0;
+}
+
+.md h1,
+.md h2,
+.md h3,
+.md h4,
+.md h5,
+.md h6 {
+  /* A chat bubble is not a document: the default h1 is over twice the body size here. */
+  margin: 0.8em 0 0.3em;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.md h1,
+.md h2 {
+  font-size: 1.1em;
+}
+
+.md ul,
+.md ol {
+  padding-left: 1.4em;
+}
+
+.md li > p {
+  margin: 0.2em 0;
+}
+
+/* `--bg-soft` is already the bubble's own background, so code needs the input surface to
+   read as recessed in both colour schemes. */
+.md code {
+  padding: 0 3px;
+  font-size: 0.92em;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+.md pre {
+  /* Code keeps its own line breaks, so the block scrolls instead of rewrapping. */
+  overflow-x: auto;
+  padding: 6px 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.md pre > code {
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.md blockquote {
+  padding-left: 8px;
+  color: var(--text-muted);
+  border-left: 3px solid var(--border);
+}
+
+/* `display: block` turns the table itself into the scroll box; the renderer emits no
+   wrapper element to hang one on. */
+.md table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.md th,
+.md td {
+  /* Columns keep a readable width and the table scrolls, rather than collapsing to a
+     couple of characters per cell in a 320px panel. */
+  white-space: nowrap;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+}
+
+.md hr {
+  margin: 0.8em 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.md a {
+  color: var(--accent);
+}
+
+.md-task {
+  margin-right: 4px;
+}
+
+.preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+/* Preset labels are user-written and unbounded, and buttons no longer wrap their text. */
+.preset-row > button {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.options {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.options fieldset {
+  /* A fieldset's UA `min-inline-size: min-content` lets it grow past the page: a select
+     contributes its longest option to min-content, so one wordy option would scroll the
+     whole form sideways instead of shrinking the control. */
+  min-inline-size: 0;
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.options legend {
+  padding: 0 6px;
+  font-weight: 600;
+}
+
+.field {
+  margin-bottom: 10px;
+}
+
+.field > label {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.preset-card {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  /* The status text beside the button is a full sentence; it takes its own line rather
+     than squeezing the button that has to stay clickable. */
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: center;
+  padding: 10px 0;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.sticky-actions > .hint,
+.sticky-actions > .error {
+  margin: 0;
+}

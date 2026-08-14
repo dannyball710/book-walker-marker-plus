@@ -1,0 +1,60 @@
+{
+  "name": "bookwalker-marker",
+  "displayName": "BOOK☆WALKER Marker",
+  "version": "0.1.0",
+  "description": "Replace the native BOOK☆WALKER viewer marker feature with extension-managed markers, notes and an LLM chat.",
+  "author": "danny",
+  "private": true,
+  "packageManager": "pnpm@11.1.1",
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "4.0.44",
+    "@ai-sdk/openai": "4.0.41",
+    "@ai-sdk/provider-utils": "5.0.27",
+    "@openrouter/ai-sdk-provider": "3.0.0",
+    "@plasmohq/messaging": "0.7.2",
+    "ai": "7.0.65",
+    "idb": "8.0.3",
+    "marked": "16.4.1",
+    "plasmo": "0.90.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.287",
+    "@types/node": "22.10.2",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "fake-indexeddb": "^6.2.5",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  },
+  "manifest": {
+    "default_locale": "en",
+    "name": "__MSG_extensionName__",
+    "description": "__MSG_extensionDescription__",
+    "permissions": [
+      "sidePanel",
+      "storage",
+      "unlimitedStorage"
+    ],
+    "host_permissions": [
+      "https://viewer.bookwalker.jp/*",
+      "https://api.notion.com/*"
+    ],
+    "optional_host_permissions": [
+      "https://openrouter.ai/*",
+      "https://api.openai.com/*",
+      "https://generativelanguage.googleapis.com/*",
+      "https://*/*"
+    ]
+  }
+}

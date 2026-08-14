@@ -1,0 +1,245 @@
+{
+  "extensionName": { "message": "BOOK☆WALKER Marker" },
+  "extensionDescription": {
+    "message": "Replaces the BOOK☆WALKER viewer's built-in marker with markers, notes and an LLM chat the extension owns."
+  },
+
+  "commonListSeparator": { "message": ", " },
+  "commonSave": { "message": "Save" },
+  "commonCancel": { "message": "Cancel" },
+  "commonDelete": { "message": "Delete" },
+  "commonClose": { "message": "Close" },
+  "commonSettings": { "message": "Settings" },
+  "commonLoading": { "message": "Loading…" },
+
+  "optionsTitle": { "message": "BOOK☆WALKER Marker settings" },
+  "optionsLoading": { "message": "Loading settings…" },
+  "optionsLoadFailed": {
+    "message": "Could not load settings: $reason$",
+    "placeholders": { "reason": { "content": "$1" } }
+  },
+  "optionsLoadFailedHint": {
+    "message": "The form stays hidden until the read succeeds, so it cannot overwrite what you already saved."
+  },
+  "optionsReload": { "message": "Try again" },
+  "optionsStorageLegend": { "message": "Storage" },
+  "optionsStorageNote": {
+    "message": "Markers live in the store you pick here only. The two never sync, and switching does not move them. This extension never writes back to your BOOK☆WALKER account."
+  },
+  "optionsLlmLegend": { "message": "LLM" },
+  "optionsSecretsLocalNote": {
+    "message": "Keys stay on this computer and are never synced to your other devices."
+  },
+  "optionsPermissionNotice": {
+    "message": "Saving asks for permission to these origins: $origins$",
+    "placeholders": { "origins": { "content": "$1" } }
+  },
+  "optionsPermissionDenied": {
+    "message": "Not saved: you denied access to $origins$. Save again and allow it, or pick a provider that needs no extra permission.",
+    "placeholders": { "origins": { "content": "$1" } }
+  },
+  "optionsSaveButton": { "message": "Save settings" },
+  "optionsSaved": { "message": "Saved. It takes effect right away." },
+  "optionsSavedLlmIncomplete": { "message": "Saved. The LLM is not configured yet." },
+  "optionsNotSavedFields": { "message": "Not saved (see the field problems above)" },
+  "optionsNotSavedPermission": { "message": "Not saved (permission denied)" },
+
+  "providersEmpty": { "message": "No provider is available." },
+  "providerLoadModels": { "message": "Load model list" },
+  "providerModelsLoaded": {
+    "message": "Loaded $count$ models.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "providerModelsDenied": {
+    "message": "You denied access to $origins$, so “$label$” was not queried. Press “Load model list” again and allow it, or type the model name yourself.",
+    "placeholders": {
+      "origins": { "content": "$1" },
+      "label": { "content": "$2" }
+    }
+  },
+  "providerModelsFailed": {
+    "message": "Could not fetch the model list for “$label$”. Check the required fields and your connection, or type the model name yourself.",
+    "placeholders": { "label": { "content": "$1" } }
+  },
+  "providerFieldMissing": {
+    "message": "⚠ Required field “$label$” is empty.",
+    "placeholders": { "label": { "content": "$1" } }
+  },
+  "providerDocsLabel": { "message": "Setup guide: " },
+  "providerUnknownSelected": {
+    "message": "The selected provider “$id$” does not exist in this version. Pick another.",
+    "placeholders": { "id": { "content": "$1" } }
+  },
+
+  "fieldSelectNone": { "message": "(not selected)" },
+  "fieldSecretHide": { "message": "Hide" },
+  "fieldSecretShow": { "message": "Show" },
+
+  "promptsLegend": { "message": "Saved prompts" },
+  "promptsIntro": {
+    "message": "These buttons appear above the chatbot in the side panel. Placeholders: "
+  },
+  "promptsVarText": { "message": " (marker text)" },
+  "promptsVarMemo": { "message": " (note)" },
+  "promptsVarBookTitle": { "message": " (book title)" },
+  "promptsEmpty": { "message": "No prompts yet." },
+  "promptLabelField": { "message": "Button text" },
+  "promptTemplateField": { "message": "Prompt body" },
+  "promptMoveUp": { "message": "Move up" },
+  "promptMoveDown": { "message": "Move down" },
+  "promptAdd": { "message": "Add prompt" },
+  "promptNewLabel": { "message": "New prompt" },
+
+  "promptPresetTranslateLabel": { "message": "Translate" },
+  "promptPresetTranslateTemplate": {
+    "message": "Translate this Japanese passage from “{{bookTitle}}” into English, keeping the tone of the original:\n\n{{text}}"
+  },
+  "promptPresetGrammarLabel": { "message": "Explain grammar" },
+  "promptPresetGrammarTemplate": {
+    "message": "Explain the grammar of this Japanese passage, breaking down the particles and verb forms sentence by sentence:\n\n{{text}}"
+  },
+  "promptPresetReadingLabel": { "message": "Kanji readings" },
+  "promptPresetReadingTemplate": {
+    "message": "Give the reading of every kanji in this Japanese passage, using the {漢字|かんじ} format:\n\n{{text}}"
+  },
+
+  "markerSectionTitle": { "message": "MARKER" },
+  "markerEmptyHint": {
+    "message": "Select text in the viewer, or tap an existing marker."
+  },
+  "markerCreate": { "message": "Create marker" },
+  "markerListHeading": {
+    "message": "MARKERS IN THIS BOOK ($count$)",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "markerMemoHint": {
+    "message": "Notes take readings as {漢字|かんじ}; they render as ruby once you leave the box."
+  },
+  "markerMemoPlaceholder": { "message": "Write a note…" },
+  "markerDiscard": { "message": "Discard" },
+  "markerDeleteConfirm": { "message": "Confirm delete" },
+  "markerColorGroupLabel": { "message": "marker colour" },
+  "markerNotFound": { "message": "No such marker; it may have been deleted." },
+  "markerDeletedNeedsReload": {
+    "message": "Marker deleted. The highlight goes away after you reload the viewer."
+  },
+
+  "chatSectionTitle": { "message": "CHATBOT" },
+  "chatPickMarker": { "message": "Pick a marker to ask about it." },
+  "chatNotStored": {
+    "message": "The conversation is not stored; it goes when you close the panel or switch passages."
+  },
+  "chatRoleUser": { "message": "you" },
+  "chatRoleAssistant": { "message": "assistant" },
+  "chatGenerating": { "message": "Generating…" },
+  "chatInputPlaceholder": { "message": "Ask about this passage…" },
+  "chatSend": { "message": "Send" },
+  "chatAbort": { "message": "Stop" },
+  "chatPortDisconnected": {
+    "message": "The connection dropped and the reply was cut off. Send it again."
+  },
+
+  "viewerSelectionFailed": {
+    "message": "Could not read the selected text. Select it again."
+  },
+
+  "errorModelRequestFailed": {
+    "message": "The model request failed. Check the API key, model id and endpoint on the settings page."
+  },
+  "errorChatRequestMalformed": { "message": "Malformed chat request." },
+  "errorMarkerGone": {
+    "message": "This marker no longer exists, so the conversation cannot continue."
+  },
+  "errorModelEmptyReply": {
+    "message": "The model returned nothing. Rephrase, or use another model."
+  },
+  "errorBookContextMissing": {
+    "message": "No information for this book, so the marker cannot be created. Reload the viewer page."
+  },
+  "errorUnknownProvider": {
+    "message": "Unknown provider “$id$”",
+    "placeholders": { "id": { "content": "$1" } }
+  },
+  "errorHostPermissionMissing": {
+    "message": "No host permission for $label$ ($origins$). Save this provider again on the settings page.",
+    "placeholders": {
+      "label": { "content": "$1" },
+      "origins": { "content": "$2" }
+    }
+  },
+  "errorProviderConfigIncomplete": {
+    "message": "$label$ is not fully configured: $issues$",
+    "placeholders": {
+      "label": { "content": "$1" },
+      "issues": { "content": "$2" }
+    }
+  },
+  "errorProviderNotFound": {
+    "message": "No $kind$ provider named “$id$”. Available: $known$.",
+    "placeholders": {
+      "kind": { "content": "$1" },
+      "id": { "content": "$2" },
+      "known": { "content": "$3" }
+    }
+  },
+  "errorNotionUnreachable": {
+    "message": "Could not reach Notion. Check your connection."
+  },
+  "errorNotionHttp": {
+    "message": "Notion returned an error (HTTP $status$): $detail$",
+    "placeholders": {
+      "status": { "content": "$1" },
+      "detail": { "content": "$2" }
+    }
+  },
+  "errorNotionRowNotOurs": {
+    "message": "This Notion row has no '$prop$' property, so this extension did not create it.",
+    "placeholders": { "prop": { "content": "$1" } }
+  },
+  "errorNotionValueUnknown": {
+    "message": "Notion page $id$ has an unrecognised '$prop$' value: '$value$'.",
+    "placeholders": {
+      "id": { "content": "$1" },
+      "prop": { "content": "$2" },
+      "value": { "content": "$3" }
+    }
+  },
+
+  "validationRequired": { "message": "Required" },
+  "validationUrl": { "message": "Enter a full http(s) URL" },
+  "validationApiKey": { "message": "Enter the API key" },
+  "validationModelId": { "message": "Enter the model id" },
+  "validationNotionPat": { "message": "Enter the integration token" },
+  "validationNotionDatabaseId": { "message": "Enter the database ID" },
+
+  "llmFieldModelLabel": { "message": "Model" },
+  "llmFieldModelHelp": {
+    "message": "Use “Load model list”, or type the model id directly."
+  },
+  "llmFieldReasoningLabel": { "message": "Reasoning effort" },
+  "llmFieldReasoningHelp": {
+    "message": "Leave empty to let the model decide. Only reasoning models take any notice."
+  },
+  "llmFieldBaseUrlLabel": { "message": "Custom endpoint" },
+  "llmFieldBaseUrlHelp": {
+    "message": "Leave empty to use $url$.",
+    "placeholders": { "url": { "content": "$1" } }
+  },
+  "llmReasoningLow": { "message": "Low" },
+  "llmReasoningMedium": { "message": "Medium" },
+  "llmReasoningHigh": { "message": "High" },
+  "llmKeyHelpLocalOnly": { "message": "Stays on this computer; never uploaded." },
+  "llmKeyHelpGemini": {
+    "message": "Get one from Google AI Studio. Stays on this computer."
+  },
+
+  "storageIdbLabel": { "message": "This device (IndexedDB)" },
+  "notionPatHelp": {
+    "message": "Share the target database with this integration. Notion gets noticeably slower once you have many markers."
+  },
+  "notionDatabaseIdPlaceholder": { "message": "32 hex characters" },
+  "notionDatabaseIdHelp": {
+    "message": "The database needs these 17 properties: $columns$",
+    "placeholders": { "columns": { "content": "$1" } }
+  }
+}

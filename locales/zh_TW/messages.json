@@ -1,0 +1,239 @@
+{
+  "extensionName": { "message": "BOOK☆WALKER Marker" },
+  "extensionDescription": {
+    "message": "用擴充套件自己的標註、備註與 LLM 對話，取代 BOOK☆WALKER 閱讀器內建的標註。"
+  },
+
+  "commonListSeparator": { "message": "、" },
+  "commonSave": { "message": "儲存" },
+  "commonCancel": { "message": "取消" },
+  "commonDelete": { "message": "刪除" },
+  "commonClose": { "message": "關閉" },
+  "commonSettings": { "message": "設定" },
+  "commonLoading": { "message": "讀取中…" },
+
+  "optionsTitle": { "message": "BOOK☆WALKER Marker 設定" },
+  "optionsLoading": { "message": "讀取設定中…" },
+  "optionsLoadFailed": {
+    "message": "讀取設定失敗：$reason$",
+    "placeholders": { "reason": { "content": "$1" } }
+  },
+  "optionsLoadFailedHint": {
+    "message": "為避免覆蓋原有設定，讀取成功前不顯示表單。"
+  },
+  "optionsReload": { "message": "重新載入" },
+  "optionsStorageLegend": { "message": "儲存位置" },
+  "optionsStorageNote": {
+    "message": "標註只存在選定的那一邊，兩邊不同步，切換也不會搬移。本擴充套件不會寫回 BOOK☆WALKER 帳號。"
+  },
+  "optionsLlmLegend": { "message": "LLM" },
+  "optionsSecretsLocalNote": {
+    "message": "金鑰只留在這台電腦，不會同步到其他裝置。"
+  },
+  "optionsPermissionNotice": {
+    "message": "儲存時會要求這些網域的權限：$origins$",
+    "placeholders": { "origins": { "content": "$1" } }
+  },
+  "optionsPermissionDenied": {
+    "message": "尚未儲存：你拒絕了 $origins$ 的權限。請重新儲存並允許，或改用不需額外權限的服務商。",
+    "placeholders": { "origins": { "content": "$1" } }
+  },
+  "optionsSaveButton": { "message": "儲存設定" },
+  "optionsSaved": { "message": "已儲存，立即生效。" },
+  "optionsSavedLlmIncomplete": { "message": "已儲存。LLM 設定尚未完成。" },
+  "optionsNotSavedFields": { "message": "尚未儲存（見上方欄位問題）" },
+  "optionsNotSavedPermission": { "message": "尚未儲存（權限被拒絕）" },
+
+  "providersEmpty": { "message": "沒有可用的服務商。" },
+  "providerLoadModels": { "message": "載入模型清單" },
+  "providerModelsLoaded": {
+    "message": "已載入 $count$ 個模型。",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "providerModelsDenied": {
+    "message": "你拒絕了 $origins$ 的權限，因此沒有查詢「$label$」。重按「載入模型清單」並允許，或手動輸入模型名稱。",
+    "placeholders": {
+      "origins": { "content": "$1" },
+      "label": { "content": "$2" }
+    }
+  },
+  "providerModelsFailed": {
+    "message": "無法取得「$label$」的模型清單。請確認必填欄位與網路，或手動輸入模型名稱。",
+    "placeholders": { "label": { "content": "$1" } }
+  },
+  "providerFieldMissing": {
+    "message": "⚠ 必填欄位「$label$」未填。",
+    "placeholders": { "label": { "content": "$1" } }
+  },
+  "providerDocsLabel": { "message": "設定說明：" },
+  "providerUnknownSelected": {
+    "message": "選定的服務商「$id$」不存在於這個版本，請重新選擇。",
+    "placeholders": { "id": { "content": "$1" } }
+  },
+
+  "fieldSelectNone": { "message": "（未選擇）" },
+  "fieldSecretHide": { "message": "隱藏" },
+  "fieldSecretShow": { "message": "顯示" },
+
+  "promptsLegend": { "message": "常用提示詞" },
+  "promptsIntro": {
+    "message": "這些按鈕會出現在側邊欄的對話區上方。可用佔位符："
+  },
+  "promptsVarText": { "message": "（標註原文）" },
+  "promptsVarMemo": { "message": "（備註）" },
+  "promptsVarBookTitle": { "message": "（書名）" },
+  "promptsEmpty": { "message": "目前沒有任何提示詞。" },
+  "promptLabelField": { "message": "按鈕文字" },
+  "promptTemplateField": { "message": "提示詞內容" },
+  "promptMoveUp": { "message": "上移" },
+  "promptMoveDown": { "message": "下移" },
+  "promptAdd": { "message": "新增提示詞" },
+  "promptNewLabel": { "message": "新的提示詞" },
+
+  "promptPresetTranslateLabel": { "message": "翻譯這段" },
+  "promptPresetTranslateTemplate": {
+    "message": "請把《{{bookTitle}}》的這段日文翻成繁體中文，並保留原文的語氣：\n\n{{text}}"
+  },
+  "promptPresetGrammarLabel": { "message": "解釋文法" },
+  "promptPresetGrammarTemplate": {
+    "message": "請解釋這段日文的文法結構，逐句拆解助詞與動詞變化：\n\n{{text}}"
+  },
+  "promptPresetReadingLabel": { "message": "漢字讀音" },
+  "promptPresetReadingTemplate": {
+    "message": "請標出這段日文中每個漢字的讀音（以 {漢字|かんじ} 格式輸出）：\n\n{{text}}"
+  },
+
+  "markerSectionTitle": { "message": "標註" },
+  "markerEmptyHint": {
+    "message": "在閱讀器選取文字，或點擊既有的標註。"
+  },
+  "markerCreate": { "message": "建立標註" },
+  "markerListHeading": {
+    "message": "本書標註（$count$）",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "markerMemoHint": {
+    "message": "備註可用 {漢字|かんじ} 寫讀音，離開編輯框後顯示為 ruby。"
+  },
+  "markerMemoPlaceholder": { "message": "輸入備註…" },
+  "markerDiscard": { "message": "捨棄" },
+  "markerDeleteConfirm": { "message": "確認刪除" },
+  "markerColorGroupLabel": { "message": "標註顏色" },
+  "markerNotFound": { "message": "找不到這個標註，可能已刪除。" },
+  "markerDeletedNeedsReload": {
+    "message": "標註已刪除，畫面上的線需重新載入閱讀器才會消失。"
+  },
+
+  "chatSectionTitle": { "message": "對話" },
+  "chatPickMarker": { "message": "選一個標註就能針對它提問。" },
+  "chatNotStored": { "message": "對話不會儲存，關閉面板或換一段就消失。" },
+  "chatRoleUser": { "message": "你" },
+  "chatRoleAssistant": { "message": "助理" },
+  "chatGenerating": { "message": "產生中…" },
+  "chatInputPlaceholder": { "message": "對這段內容提問…" },
+  "chatSend": { "message": "送出" },
+  "chatAbort": { "message": "中止" },
+  "chatPortDisconnected": {
+    "message": "連線中斷，回覆已中止。請重新送出。"
+  },
+
+  "viewerSelectionFailed": { "message": "無法取得選取的文字，請重新選取。" },
+
+  "errorModelRequestFailed": {
+    "message": "模型請求失敗。請到設定頁確認 API key、模型 id 與端點。"
+  },
+  "errorChatRequestMalformed": { "message": "對話請求格式錯誤。" },
+  "errorMarkerGone": { "message": "這個標註已不存在，無法繼續對話。" },
+  "errorModelEmptyReply": {
+    "message": "模型沒有回覆內容。請換個問法或改用其他模型。"
+  },
+  "errorBookContextMissing": {
+    "message": "找不到這本書的資訊，無法建立標註。請重新整理閱讀器頁面。"
+  },
+  "errorUnknownProvider": {
+    "message": "未知的服務商「$id$」",
+    "placeholders": { "id": { "content": "$1" } }
+  },
+  "errorHostPermissionMissing": {
+    "message": "尚未取得 $label$ 的網域權限（$origins$）。請到設定頁重新儲存這個服務商。",
+    "placeholders": {
+      "label": { "content": "$1" },
+      "origins": { "content": "$2" }
+    }
+  },
+  "errorProviderConfigIncomplete": {
+    "message": "$label$ 的設定不完整：$issues$",
+    "placeholders": {
+      "label": { "content": "$1" },
+      "issues": { "content": "$2" }
+    }
+  },
+  "errorProviderNotFound": {
+    "message": "找不到 $kind$ 服務商「$id$」，可用的是：$known$。",
+    "placeholders": {
+      "kind": { "content": "$1" },
+      "id": { "content": "$2" },
+      "known": { "content": "$3" }
+    }
+  },
+  "errorNotionUnreachable": {
+    "message": "無法連線到 Notion，請確認網路連線。"
+  },
+  "errorNotionHttp": {
+    "message": "Notion 回應錯誤（HTTP $status$）：$detail$",
+    "placeholders": {
+      "status": { "content": "$1" },
+      "detail": { "content": "$2" }
+    }
+  },
+  "errorNotionRowNotOurs": {
+    "message": "這一列 Notion 資料沒有 '$prop$' 欄位，不是本擴充套件建立的。",
+    "placeholders": { "prop": { "content": "$1" } }
+  },
+  "errorNotionValueUnknown": {
+    "message": "Notion 頁面 $id$ 的 '$prop$' 值無法辨識：'$value$'。",
+    "placeholders": {
+      "id": { "content": "$1" },
+      "prop": { "content": "$2" },
+      "value": { "content": "$3" }
+    }
+  },
+
+  "validationRequired": { "message": "必填" },
+  "validationUrl": { "message": "請輸入完整的 http(s) 網址" },
+  "validationApiKey": { "message": "請填寫 API 金鑰" },
+  "validationModelId": { "message": "請填寫模型 id" },
+  "validationNotionPat": { "message": "請填寫 Integration Token" },
+  "validationNotionDatabaseId": { "message": "請填寫 Database ID" },
+
+  "llmFieldModelLabel": { "message": "模型" },
+  "llmFieldModelHelp": {
+    "message": "可用「載入模型清單」帶出，或直接輸入模型 id。"
+  },
+  "llmFieldReasoningLabel": { "message": "推理強度" },
+  "llmFieldReasoningHelp": {
+    "message": "留空由模型自行決定。只有支援推理的模型會理會。"
+  },
+  "llmFieldBaseUrlLabel": { "message": "自訂端點" },
+  "llmFieldBaseUrlHelp": {
+    "message": "留空即使用 $url$。",
+    "placeholders": { "url": { "content": "$1" } }
+  },
+  "llmReasoningLow": { "message": "低" },
+  "llmReasoningMedium": { "message": "中" },
+  "llmReasoningHigh": { "message": "高" },
+  "llmKeyHelpLocalOnly": { "message": "只留在這台電腦，不會上傳。" },
+  "llmKeyHelpGemini": {
+    "message": "在 Google AI Studio 取得。只留在這台電腦。"
+  },
+
+  "storageIdbLabel": { "message": "本機（IndexedDB）" },
+  "notionPatHelp": {
+    "message": "把目標 database 分享給這個整合。標註一多，Notion 的讀寫會明顯變慢。"
+  },
+  "notionDatabaseIdPlaceholder": { "message": "32 碼十六進位字串" },
+  "notionDatabaseIdHelp": {
+    "message": "Database 需要這 17 個欄位：$columns$",
+    "placeholders": { "columns": { "content": "$1" } }
+  }
+}

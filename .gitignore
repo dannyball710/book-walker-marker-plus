@@ -1,0 +1,7 @@
+node_modules
+.plasmo
+build
+out
+keys.json
+.env*
+!.env.example

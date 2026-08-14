@@ -1,0 +1,247 @@
+{
+  "extensionName": { "message": "BOOK☆WALKER Marker" },
+  "extensionDescription": {
+    "message": "BOOK☆WALKER ビューアの標準マーカーを、拡張機能が管理するマーカー・メモ・LLM チャットで置き換えます。"
+  },
+
+  "commonListSeparator": { "message": "、" },
+  "commonSave": { "message": "保存" },
+  "commonCancel": { "message": "キャンセル" },
+  "commonDelete": { "message": "削除" },
+  "commonClose": { "message": "閉じる" },
+  "commonSettings": { "message": "設定" },
+  "commonLoading": { "message": "読み込み中…" },
+
+  "optionsTitle": { "message": "BOOK☆WALKER Marker 設定" },
+  "optionsLoading": { "message": "設定を読み込み中…" },
+  "optionsLoadFailed": {
+    "message": "設定の読み込みに失敗しました：$reason$",
+    "placeholders": { "reason": { "content": "$1" } }
+  },
+  "optionsLoadFailedHint": {
+    "message": "保存済みの内容を上書きしないよう、読み込みに成功するまでフォームは表示しません。"
+  },
+  "optionsReload": { "message": "再読み込み" },
+  "optionsStorageLegend": { "message": "保存先" },
+  "optionsStorageNote": {
+    "message": "マーカーはここで選んだ保存先にのみ入ります。両者は同期せず、切り替えても移動しません。BOOK☆WALKER のアカウントに書き戻すことはありません。"
+  },
+  "optionsLlmLegend": { "message": "LLM" },
+  "optionsSecretsLocalNote": {
+    "message": "キーはこの端末にのみ残り、他の端末には同期されません。"
+  },
+  "optionsPermissionNotice": {
+    "message": "保存時に次のオリジンへの権限を要求します：$origins$",
+    "placeholders": { "origins": { "content": "$1" } }
+  },
+  "optionsPermissionDenied": {
+    "message": "未保存：$origins$ へのアクセスが拒否されました。もう一度保存して許可するか、追加権限の不要なプロバイダーを選んでください。",
+    "placeholders": { "origins": { "content": "$1" } }
+  },
+  "optionsSaveButton": { "message": "設定を保存" },
+  "optionsSaved": { "message": "保存しました。すぐに反映されます。" },
+  "optionsSavedLlmIncomplete": { "message": "保存しました。LLM の設定は未完了です。" },
+  "optionsNotSavedFields": { "message": "未保存（上の項目の問題を確認）" },
+  "optionsNotSavedPermission": { "message": "未保存（権限が拒否されました）" },
+
+  "providersEmpty": { "message": "利用できるプロバイダーがありません。" },
+  "providerLoadModels": { "message": "モデル一覧を取得" },
+  "providerModelsLoaded": {
+    "message": "$count$ 件のモデルを取得しました。",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "providerModelsDenied": {
+    "message": "$origins$ へのアクセスが拒否されたため、「$label$」には問い合わせていません。もう一度「モデル一覧を取得」を押して許可するか、モデル名を手入力してください。",
+    "placeholders": {
+      "origins": { "content": "$1" },
+      "label": { "content": "$2" }
+    }
+  },
+  "providerModelsFailed": {
+    "message": "「$label$」のモデル一覧を取得できません。必須項目とネットワークを確認するか、モデル名を手入力してください。",
+    "placeholders": { "label": { "content": "$1" } }
+  },
+  "providerFieldMissing": {
+    "message": "⚠ 必須項目「$label$」が未入力です。",
+    "placeholders": { "label": { "content": "$1" } }
+  },
+  "providerDocsLabel": { "message": "設定ガイド：" },
+  "providerUnknownSelected": {
+    "message": "選択中のプロバイダー「$id$」はこのバージョンに存在しません。選び直してください。",
+    "placeholders": { "id": { "content": "$1" } }
+  },
+
+  "fieldSelectNone": { "message": "（未選択）" },
+  "fieldSecretHide": { "message": "隠す" },
+  "fieldSecretShow": { "message": "表示" },
+
+  "promptsLegend": { "message": "よく使うプロンプト" },
+  "promptsIntro": {
+    "message": "これらのボタンはサイドパネルのチャットの上に並びます。使えるプレースホルダー："
+  },
+  "promptsVarText": { "message": "（マーカーの原文）" },
+  "promptsVarMemo": { "message": "（メモ）" },
+  "promptsVarBookTitle": { "message": "（書名）" },
+  "promptsEmpty": { "message": "プロンプトがまだありません。" },
+  "promptLabelField": { "message": "ボタンの文字" },
+  "promptTemplateField": { "message": "プロンプト本文" },
+  "promptMoveUp": { "message": "上へ" },
+  "promptMoveDown": { "message": "下へ" },
+  "promptAdd": { "message": "プロンプトを追加" },
+  "promptNewLabel": { "message": "新しいプロンプト" },
+
+  "promptPresetTranslateLabel": { "message": "訳す" },
+  "promptPresetTranslateTemplate": {
+    "message": "『{{bookTitle}}』のこの一節を、原文の語調を保ったまま現代日本語に言い換えてください：\n\n{{text}}"
+  },
+  "promptPresetGrammarLabel": { "message": "文法を解説" },
+  "promptPresetGrammarTemplate": {
+    "message": "この一節の文法構造を、助詞と動詞の活用に分けて一文ずつ解説してください：\n\n{{text}}"
+  },
+  "promptPresetReadingLabel": { "message": "漢字の読み" },
+  "promptPresetReadingTemplate": {
+    "message": "この一節の漢字すべてに読みを付けてください（{漢字|かんじ} の形式で出力）：\n\n{{text}}"
+  },
+
+  "markerSectionTitle": { "message": "マーカー" },
+  "markerEmptyHint": {
+    "message": "ビューアで文字を選択するか、既存のマーカーをタップしてください。"
+  },
+  "markerCreate": { "message": "マーカーを作成" },
+  "markerListHeading": {
+    "message": "この本のマーカー（$count$）",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "markerMemoHint": {
+    "message": "メモには {漢字|かんじ} の形式で読みを書けます。編集を離れるとルビとして表示されます。"
+  },
+  "markerMemoPlaceholder": { "message": "メモを入力…" },
+  "markerDiscard": { "message": "破棄" },
+  "markerDeleteConfirm": { "message": "削除を確定" },
+  "markerColorGroupLabel": { "message": "マーカーの色" },
+  "markerNotFound": { "message": "このマーカーは見つかりません。削除された可能性があります。" },
+  "markerDeletedNeedsReload": {
+    "message": "マーカーを削除しました。画面上の線はビューアを再読み込みすると消えます。"
+  },
+
+  "chatSectionTitle": { "message": "チャット" },
+  "chatPickMarker": { "message": "マーカーを選ぶと、それについて質問できます。" },
+  "chatNotStored": {
+    "message": "会話は保存されません。パネルを閉じるか別の箇所に移ると消えます。"
+  },
+  "chatRoleUser": { "message": "あなた" },
+  "chatRoleAssistant": { "message": "アシスタント" },
+  "chatGenerating": { "message": "生成中…" },
+  "chatInputPlaceholder": { "message": "この箇所について質問…" },
+  "chatSend": { "message": "送信" },
+  "chatAbort": { "message": "中止" },
+  "chatPortDisconnected": {
+    "message": "接続が切れ、返信は中断されました。もう一度送信してください。"
+  },
+
+  "viewerSelectionFailed": {
+    "message": "選択したテキストを取得できません。選び直してください。"
+  },
+
+  "errorModelRequestFailed": {
+    "message": "モデルへのリクエストが失敗しました。設定ページで API key・モデル id・エンドポイントを確認してください。"
+  },
+  "errorChatRequestMalformed": { "message": "チャットリクエストの形式が不正です。" },
+  "errorMarkerGone": {
+    "message": "このマーカーはすでに存在しないため、会話を続けられません。"
+  },
+  "errorModelEmptyReply": {
+    "message": "モデルが何も返しませんでした。聞き方を変えるか、別のモデルを使ってください。"
+  },
+  "errorBookContextMissing": {
+    "message": "この本の情報が見つからず、マーカーを作成できません。ビューアを再読み込みしてください。"
+  },
+  "errorUnknownProvider": {
+    "message": "不明なプロバイダー「$id$」",
+    "placeholders": { "id": { "content": "$1" } }
+  },
+  "errorHostPermissionMissing": {
+    "message": "$label$ のオリジン権限（$origins$）がまだありません。設定ページでこのプロバイダーを保存し直してください。",
+    "placeholders": {
+      "label": { "content": "$1" },
+      "origins": { "content": "$2" }
+    }
+  },
+  "errorProviderConfigIncomplete": {
+    "message": "$label$ の設定が不完全です：$issues$",
+    "placeholders": {
+      "label": { "content": "$1" },
+      "issues": { "content": "$2" }
+    }
+  },
+  "errorProviderNotFound": {
+    "message": "$kind$ プロバイダー「$id$」が見つかりません。利用できるのは：$known$。",
+    "placeholders": {
+      "kind": { "content": "$1" },
+      "id": { "content": "$2" },
+      "known": { "content": "$3" }
+    }
+  },
+  "errorNotionUnreachable": {
+    "message": "Notion に接続できません。ネットワークを確認してください。"
+  },
+  "errorNotionHttp": {
+    "message": "Notion がエラーを返しました（HTTP $status$）：$detail$",
+    "placeholders": {
+      "status": { "content": "$1" },
+      "detail": { "content": "$2" }
+    }
+  },
+  "errorNotionRowNotOurs": {
+    "message": "この Notion の行には '$prop$' 列がなく、この拡張機能が作成したものではありません。",
+    "placeholders": { "prop": { "content": "$1" } }
+  },
+  "errorNotionValueUnknown": {
+    "message": "Notion ページ $id$ の '$prop$' の値を認識できません：'$value$'。",
+    "placeholders": {
+      "id": { "content": "$1" },
+      "prop": { "content": "$2" },
+      "value": { "content": "$3" }
+    }
+  },
+
+  "validationRequired": { "message": "必須" },
+  "validationUrl": { "message": "完全な http(s) URL を入力してください" },
+  "validationApiKey": { "message": "API キーを入力してください" },
+  "validationModelId": { "message": "モデル id を入力してください" },
+  "validationNotionPat": { "message": "Integration Token を入力してください" },
+  "validationNotionDatabaseId": { "message": "Database ID を入力してください" },
+
+  "llmFieldModelLabel": { "message": "モデル" },
+  "llmFieldModelHelp": {
+    "message": "「モデル一覧を取得」で選ぶか、モデル id を直接入力できます。"
+  },
+  "llmFieldReasoningLabel": { "message": "推論の強さ" },
+  "llmFieldReasoningHelp": {
+    "message": "空欄ならモデルに任せます。推論対応モデルのみが参照します。"
+  },
+  "llmFieldBaseUrlLabel": { "message": "カスタムエンドポイント" },
+  "llmFieldBaseUrlHelp": {
+    "message": "空欄なら $url$ を使います。",
+    "placeholders": { "url": { "content": "$1" } }
+  },
+  "llmReasoningLow": { "message": "低" },
+  "llmReasoningMedium": { "message": "中" },
+  "llmReasoningHigh": { "message": "高" },
+  "llmKeyHelpLocalOnly": {
+    "message": "この端末にのみ保存され、送信されません。"
+  },
+  "llmKeyHelpGemini": {
+    "message": "Google AI Studio で取得。この端末にのみ保存されます。"
+  },
+
+  "storageIdbLabel": { "message": "この端末（IndexedDB）" },
+  "notionPatHelp": {
+    "message": "対象の database をこのインテグレーションに共有してください。マーカーが増えると Notion は目に見えて遅くなります。"
+  },
+  "notionDatabaseIdPlaceholder": { "message": "32 桁の十六進文字列" },
+  "notionDatabaseIdHelp": {
+    "message": "database には次の 17 列が必要です：$columns$",
+    "placeholders": { "columns": { "content": "$1" } }
+  }
+}
