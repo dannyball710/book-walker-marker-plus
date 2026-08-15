@@ -26,17 +26,15 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up pnpm and Node.js
+        uses: pnpm/setup@v2
         with:
-          node-version: 22
-          cache: pnpm
+          runtime: node@22
+          cache: true
           cache-dependency-path: pnpm-lock.yaml
+          install: false
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -72,7 +70,7 @@ jobs:
           echo "archive_name=${archive_name}" >> "${GITHUB_OUTPUT}"
 
       - name: Upload extension archive
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.archive.outputs.artifact_name }}
           path: artifacts/${{ steps.archive.outputs.archive_name }}
@@ -89,7 +87,7 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Validate version tag
         shell: bash
@@ -101,7 +99,7 @@ jobs:
           fi
 
       - name: Download extension archive
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.build.outputs.artifact_name }}
           path: artifacts
