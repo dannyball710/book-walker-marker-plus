@@ -120,10 +120,11 @@ Add new strings to `en` first. `tests/core/i18n/catalog.test.ts` fails if the th
 catalogues drift apart. Where `chrome.i18n` is absent (unit tests, MAIN world) `t()` falls
 back to the bundled `en` text, so it is safe to call anywhere and needs no stub.
 
-Deliberately **not** localised: the Notion property names (`原文` / `備註` / `書籍`) and the
-list of required columns, because they are a database schema and translating them would
-break every existing database; the reader's own button labels that we match against; and the
-LLM system prompt, which is written for the model.
+The three reader-facing Notion property names are localised. `PROP_ALIASES` keeps rows from
+all shipped locales readable, and schema repair renames a compatible alias without changing
+its values; technical property names remain stable. Deliberately not localised: the reader's
+own button labels that we match against, and the LLM system prompt wording (its configured
+response language is localised separately).
 
 ### Font profiles
 

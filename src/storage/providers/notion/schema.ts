@@ -3,7 +3,10 @@ import type {
   NotionSchemaIssue,
   NotionSchemaStatus
 } from "~/core/notion/types"
-import { PROP } from "~/storage/providers/notion/mapping"
+import {
+  PROP,
+  PROP_ALIASES
+} from "~/storage/providers/notion/property-names"
 
 export interface NotionDatabaseProperty {
   readonly id: string
@@ -34,10 +37,15 @@ export interface NotionSchemaPlan {
 const REQUIRED_PROPERTIES: readonly {
   readonly name: string
   readonly type: NotionPropertyType
+  readonly aliases?: readonly string[]
 }[] = [
-  { name: PROP.text, type: "title" },
-  { name: PROP.memo, type: "rich_text" },
-  { name: PROP.bookTitle, type: "rich_text" },
+  { name: PROP.text, type: "title", aliases: PROP_ALIASES.text },
+  { name: PROP.memo, type: "rich_text", aliases: PROP_ALIASES.memo },
+  {
+    name: PROP.bookTitle,
+    type: "rich_text",
+    aliases: PROP_ALIASES.bookTitle
+  },
   { name: PROP.bookId, type: "rich_text" },
   { name: PROP.markerId, type: "rich_text" },
   { name: PROP.epubcfi, type: "rich_text" },
@@ -53,6 +61,19 @@ const REQUIRED_PROPERTIES: readonly {
   { name: PROP.createdAt, type: "date" },
   { name: PROP.updatedAt, type: "date" }
 ]
+
+function propertyByAlias(
+  aliases: readonly string[] | undefined,
+  byName: ReadonlyMap<string, NotionDatabaseProperty>,
+  current: string
+): NotionDatabaseProperty | undefined {
+  for (const alias of aliases ?? []) {
+    if (alias === current) continue
+    const property = byName.get(alias)
+    if (property !== undefined) return property
+  }
+  return undefined
+}
 
 function updateFor(type: NotionPropertyType, name?: string): NotionPropertyUpdate {
   const named = name === undefined ? {} : { name }
@@ -110,7 +131,9 @@ export function planNotionSchema(
       continue
     }
 
-    const existing = byName.get(required.name)
+    const existing =
+      byName.get(required.name) ??
+      propertyByAlias(required.aliases, byName, required.name)
     if (existing === undefined) {
       patch[required.name] = updateFor(required.type)
       issues.push({
@@ -129,6 +152,16 @@ export function planNotionSchema(
         property: required.name,
         expected: required.type,
         actual: existing.type
+      })
+      continue
+    }
+    if (existing.name !== required.name) {
+      patch[existing.id] = { name: required.name }
+      issues.push({
+        kind: "title_name",
+        property: required.name,
+        expected: required.type,
+        actual: existing.name
       })
     }
   }

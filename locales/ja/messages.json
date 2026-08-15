@@ -299,6 +299,9 @@
   },
 
   "storageIdbLabel": { "message": "この端末（IndexedDB）" },
+  "notionPropertyTextName": { "message": "本文" },
+  "notionPropertyMemoName": { "message": "メモ" },
+  "notionPropertyBookName": { "message": "書籍" },
   "notionPatLabel": { "message": "インテグレーショントークン" },
   "notionDatabaseFieldLabel": { "message": "データベース" },
   "notionDatabasePickerTitle": { "message": "データベースを選択" },
@@ -327,7 +330,7 @@
     }
   },
   "notionSchemaTitleRename": {
-    "message": "タイトル列「$current$」を「$property$」に変更",
+    "message": "列「$current$」を「$property$」に変更",
     "placeholders": {
       "current": { "content": "$1" },
       "property": { "content": "$2" }

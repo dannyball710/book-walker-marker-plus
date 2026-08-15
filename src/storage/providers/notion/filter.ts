@@ -1,6 +1,6 @@
 import type { MarkerQuery } from "~/core/marker/types"
 import { assertProfiledQuery } from "~/storage/provider"
-import { PROP } from "~/storage/providers/notion/mapping"
+import { PROP } from "~/storage/providers/notion/property-names"
 
 export type NotionCondition =
   | {

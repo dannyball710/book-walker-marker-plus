@@ -289,6 +289,9 @@
   },
 
   "storageIdbLabel": { "message": "本機（IndexedDB）" },
+  "notionPropertyTextName": { "message": "原文" },
+  "notionPropertyMemoName": { "message": "備註" },
+  "notionPropertyBookName": { "message": "書籍" },
   "notionPatLabel": { "message": "整合權杖（Integration Token）" },
   "notionDatabaseFieldLabel": { "message": "資料庫" },
   "notionDatabasePickerTitle": { "message": "選擇資料庫" },
@@ -317,7 +320,7 @@
     }
   },
   "notionSchemaTitleRename": {
-    "message": "將 title 欄位「$current$」改名為「$property$」",
+    "message": "將欄位「$current$」改名為「$property$」",
     "placeholders": {
       "current": { "content": "$1" },
       "property": { "content": "$2" }

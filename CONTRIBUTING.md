@@ -63,7 +63,7 @@ internationalization or marker locators.
 
 - Write source comments and project documentation in English.
 - Explain purpose and non-obvious constraints rather than restating syntax.
-- Preserve functional CJK content in locale catalogues, Notion schema identifiers,
+- Preserve functional CJK content in locale catalogues, localized Notion schema aliases,
   Book Walker label matching and language-specific tests.
 - Add user-facing strings to `locales/en/messages.json` first, then update every locale.
 - Follow the existing formatting and naming conventions; do not reformat unrelated files.

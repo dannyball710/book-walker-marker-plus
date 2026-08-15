@@ -98,7 +98,7 @@ describe("NotionClient database setup", () => {
       "https://api.notion.com/v1/databases/database-1",
       expect.objectContaining({
         method: "PATCH",
-        body: expect.stringContaining('"備註":{"rich_text":{}}')
+        body: expect.stringContaining('"Note":{"rich_text":{}}')
       })
     )
   })
