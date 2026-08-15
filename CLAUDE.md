@@ -21,6 +21,12 @@ pnpm test tests/viewer/marker-color.test.ts    # one file
 pnpm test -t "joins with the locale"           # by test name
 ```
 
+Do not add `engines.node` to `package.json`. Plasmo's Parcel 2.9 inherits it when creating
+the WebExtension target, misclassifies the build as Node, and leaves browser dependencies
+such as `zod` as runtime externals. Keep the Node requirement in `.nvmrc`, documentation and
+CI instead. `pnpm verify:package` executes the built service worker in a browser-like VM to
+catch this failure mode.
+
 **Reloading the reader tab is not enough to see a code change.** Reload the extension on
 `chrome://extensions` first, then refresh the tab. Neither content script applies to a tab
 that was open before the extension loaded, and the MAIN-world script is registered at
