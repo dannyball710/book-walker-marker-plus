@@ -1,7 +1,7 @@
 {
   "name": "book-walker-marker-plus",
   "displayName": "Book Walker Marker Plus",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Chrome extension for portable Book Walker highlights, notes and passage-scoped LLM chat.",
   "author": "danny",
   "license": "AGPL-3.0-only",
@@ -13,9 +13,6 @@
     "highlights",
     "plasmo"
   ],
-  "engines": {
-    "node": ">=22"
-  },
   "packageManager": "pnpm@11.1.1",
   "scripts": {
     "dev": "plasmo dev",
