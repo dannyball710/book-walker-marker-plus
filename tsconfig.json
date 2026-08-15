@@ -42,7 +42,8 @@
     "src",
     "tests",
     "*.ts",
-    "*.config.ts"
+    "*.config.ts",
+    "*.config.mts"
   ],
   "exclude": [
     "node_modules",

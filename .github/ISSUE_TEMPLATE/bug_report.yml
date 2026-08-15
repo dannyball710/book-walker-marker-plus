@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a reproducible problem in the extension
+title: "[Bug]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug. Remove credentials, private notes and copyrighted book text before submitting.
+  - type: input
+    id: version
+    attributes:
+      label: Extension version
+      description: Release version or commit hash.
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Chrome version and operating system.
+      placeholder: Chrome 130 on Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest repeatable sequence using non-sensitive sample text.
+      placeholder: |
+        1. Open ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include sanitized errors or screenshots if useful.
+    validations:
+      required: true
+  - type: dropdown
+    id: storage
+    attributes:
+      label: Storage provider
+      options:
+        - IndexedDB
+        - Notion
+        - Not applicable
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Data safety
+      options:
+        - label: I removed API keys, tokens, private notes, database identifiers and copyrighted book text.
+          required: true

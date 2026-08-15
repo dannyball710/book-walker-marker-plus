@@ -1,5 +1,5 @@
 /**
- * Parser for the `{漢字|かんじ}` ruby annotation syntax used in marker memos.
+ * Parser for the `{base|reading}` ruby annotation syntax used in marker memos.
  */
 
 export type RubySegment =

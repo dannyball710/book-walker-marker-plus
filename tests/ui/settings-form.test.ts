@@ -106,6 +106,7 @@ describe("normalizeSettings", () => {
       active: "openrouter",
       configs: [{ providerId: "openrouter", values: { apiKey: " sk-1\n" } }]
     },
+    responseLanguage: " English ",
     prompts: [
       { id: "p1", label: "Translate", template: "{{text}}", order: 5 },
       { id: "p2", label: "  ", template: "  ", order: 6 }
@@ -115,6 +116,14 @@ describe("normalizeSettings", () => {
   it("trims values so a pasted trailing newline cannot break auth", () => {
     const result = normalizeSettings(settings, catalog)
     expect(result.llm.configs[0]?.values).toEqual({ apiKey: "sk-1" })
+    expect(result.responseLanguage).toBe("English")
+  })
+
+  it("restores the i18n default when the response language is blank", () => {
+    expect(
+      normalizeSettings({ ...settings, responseLanguage: "   " }, catalog)
+        .responseLanguage
+    ).toBe("English")
   })
 
   it("keeps the inactive provider's credentials, so switching back needs no retyping", () => {

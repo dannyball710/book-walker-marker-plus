@@ -14,7 +14,7 @@ export function RubyText(props: {
         <Fragment key={index}>
           {segment.kind === "text" && segment.value}
           {segment.kind === "ruby" && (
-            <ruby>
+            <ruby data-bwm-ruby={`{${segment.base}|${segment.rt}}`}>
               {segment.base}
               <rt>{segment.rt}</rt>
             </ruby>

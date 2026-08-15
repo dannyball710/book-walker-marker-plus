@@ -1,7 +1,15 @@
-import { describe, expect, test } from "vitest"
+import { afterEach, describe, expect, test } from "vitest"
 
 import { expandPrompt } from "~/core/prompt/expand"
-import { DEFAULT_SETTINGS, parseSettings } from "~/core/settings/defaults"
+import {
+  createDefaultSettings,
+  DEFAULT_SETTINGS,
+  parseSettings
+} from "~/core/settings/defaults"
+
+afterEach(() => {
+  Reflect.deleteProperty(globalThis, "chrome")
+})
 
 describe("DEFAULT_SETTINGS", () => {
   test("stores locally and talks to OpenRouter until the user configures otherwise", () => {
@@ -9,13 +17,27 @@ describe("DEFAULT_SETTINGS", () => {
     expect(DEFAULT_SETTINGS.storage.configs).toEqual([])
     expect(DEFAULT_SETTINGS.llm.active).toBe("openrouter")
     expect(DEFAULT_SETTINGS.llm.configs).toEqual([])
+    expect(DEFAULT_SETTINGS.responseLanguage).toBe("English")
   })
 
   test("ships prompt presets that all reference the marker text", () => {
     expect(DEFAULT_SETTINGS.prompts.length).toBeGreaterThanOrEqual(2)
     for (const preset of DEFAULT_SETTINGS.prompts) {
       expect(preset.template).toContain("{{text}}")
+      expect(preset.template).toContain("{{responseLanguage}}")
     }
+  })
+
+  test("takes the initial response language from chrome.i18n", () => {
+    Reflect.set(globalThis, "chrome", {
+      i18n: {
+        getMessage(key: string) {
+          return key === "assistantResponseLanguage" ? "日本語" : ""
+        }
+      }
+    })
+
+    expect(createDefaultSettings().responseLanguage).toBe("日本語")
   })
 
   test("preset placeholders all resolve, leaving nothing to expand", () => {
@@ -23,7 +45,8 @@ describe("DEFAULT_SETTINGS", () => {
       const expanded = expandPrompt(preset.template, {
         text: "テスト本文",
         memo: "note",
-        bookTitle: "サンプル書籍"
+        bookTitle: "サンプル書籍",
+        responseLanguage: "English"
       })
       expect(expanded).not.toMatch(/\{\{\s*[A-Za-z]+\s*\}\}/)
     }
@@ -51,6 +74,21 @@ describe("parseSettings", () => {
     expect(settings.storage).toEqual(DEFAULT_SETTINGS.storage)
     expect(settings.prompts).toEqual(DEFAULT_SETTINGS.prompts)
     expect(settings.llm.active).toBe("openai")
+  })
+
+  test("fills a missing or blank response language from the current locale", () => {
+    const withoutLanguage = { ...DEFAULT_SETTINGS }
+    Reflect.deleteProperty(withoutLanguage, "responseLanguage")
+
+    expect(parseSettings(withoutLanguage).responseLanguage).toBe("English")
+    expect(
+      parseSettings({ ...DEFAULT_SETTINGS, responseLanguage: "   " })
+        .responseLanguage
+    ).toBe("English")
+    expect(
+      parseSettings({ ...DEFAULT_SETTINGS, responseLanguage: " Deutsch " })
+        .responseLanguage
+    ).toBe("Deutsch")
   })
 
   test("keeps an unknown provider id: only a registry can judge it", () => {

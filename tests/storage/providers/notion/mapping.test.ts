@@ -70,6 +70,29 @@ describe("notion property mapping", () => {
     expect(notionPageToMarker(asApiPage(marker))).toEqual(marker)
   })
 
+  it("stores a comma-free Notion select name for the marker colour", () => {
+    expect(markerToNotionProperties(marker).color).toEqual({
+      select: { name: "yellow" }
+    })
+  })
+
+  it("still reads the legacy raw rgba colour name", () => {
+    const legacy = withProperty(asApiPage(marker), "color", {
+      select: { name: marker.color }
+    })
+
+    expect(notionPageToMarker(legacy).color).toBe(marker.color)
+  })
+
+  it("stores surrounding text in the existing technical JSON payload", () => {
+    const contextual: BwMarker = {
+      ...marker,
+      contextText: `直前の十文字${marker.text}直後の十文字`
+    }
+
+    expect(notionPageToMarker(asApiPage(contextual))).toEqual(contextual)
+  })
+
   it("keeps every profile's locator, so a font change does not erase the backfill", () => {
     const backfilled: BwMarker = {
       ...marker,
@@ -94,6 +117,33 @@ describe("notion property mapping", () => {
       "normal_default"
     ])
     expect(restored).toEqual(backfilled)
+  })
+
+  it("joins the briefly used split context payload when reading it back", () => {
+    const splitContext = withProperty(asApiPage(marker), "byProfile", {
+      rich_text: [
+        {
+          plain_text: JSON.stringify({
+            version: 1,
+            byProfile: marker.locator.byProfile,
+            contextBefore: "選択前",
+            contextAfter: "選択後"
+          })
+        }
+      ]
+    })
+
+    expect(notionPageToMarker(splitContext).contextText).toBe(
+      `選択前${marker.text}選択後`
+    )
+  })
+
+  it("reads the legacy raw byProfile JSON written before the context envelope", () => {
+    const legacy = withProperty(asApiPage(marker), "byProfile", {
+      rich_text: [{ plain_text: JSON.stringify(marker.locator.byProfile) }]
+    })
+
+    expect(notionPageToMarker(legacy)).toEqual(marker)
   })
 
   it("rebuilds the captured profile from the flat columns for a row written before byProfile existed", () => {

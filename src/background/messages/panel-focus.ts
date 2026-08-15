@@ -4,7 +4,7 @@ import { handle, requireBody } from "~/background/result"
 import type { PanelFocusMessage } from "~/core/messaging/protocol"
 
 const handler = handle<PanelFocusRequest, null>(async (request) => {
-  const { markerId } = requireBody(request.body)
+  const { marker } = requireBody(request.body)
   const tabId = request.sender?.tab?.id
 
   // Started before any await: Chrome only honours open() while the click that
@@ -12,7 +12,7 @@ const handler = handle<PanelFocusRequest, null>(async (request) => {
   const opening =
     tabId === undefined ? null : chrome.sidePanel.open({ tabId })
 
-  await setPendingFocus(markerId)
+  await setPendingFocus(marker)
   if (opening !== null) {
     try {
       await opening
@@ -21,7 +21,7 @@ const handler = handle<PanelFocusRequest, null>(async (request) => {
     }
   }
 
-  const message: PanelFocusMessage = { type: "panel/focus-marker", markerId }
+  const message: PanelFocusMessage = { type: "panel/focus-marker", marker }
   try {
     await chrome.runtime.sendMessage(message)
   } catch (error) {

@@ -94,6 +94,20 @@ describe("parseContentCommand", () => {
     })
   })
 
+  it("validates a marker pushed for immediate painting", () => {
+    const command = {
+      type: "content/upsert-highlight",
+      bookId: "book-1",
+      profile: "normal_default",
+      marker: RAW_ITEM
+    }
+
+    expect(parseContentCommand(command)).toEqual(command)
+    expect(
+      parseContentCommand({ ...command, profile: "unknown_default" })
+    ).toBeNull()
+  })
+
   it("requires a marker id to unpaint a highlight", () => {
     expect(
       parseContentCommand({ type: "content/remove-highlight", markerId: "m1" })
@@ -148,7 +162,8 @@ describe("parseBridgeToUiMessage", () => {
       sfs: "normal",
       sff: "default",
       cfi: "epubcfi(/6/24!/4/2/8,/3:11,/3:15)",
-      text: "テスト本文"
+      text: "テスト本文",
+      contextText: "直前の十文字テスト本文直後の十文字"
     }
     expect(
       parseBridgeToUiMessage({ source: BRIDGE_SOURCE, type: "selection", payload })

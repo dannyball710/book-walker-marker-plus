@@ -4,7 +4,6 @@ import { t } from "~/core/i18n"
 
 import {
   FONT_PROFILES,
-  MARKER_COLORS,
   type BwMarker,
   type FontProfile,
   type MarkerColor,
@@ -78,10 +77,18 @@ export function markerToNotionProperties(marker: BwMarker): NotionProperties {
     [PROP.sidx]: { number: loc?.sidx ?? null },
     [PROP.eidx]: { number: loc?.eidx ?? null },
     [PROP.position]: { rich_text: toRichText(loc?.position ?? "") },
-    [PROP.color]: { select: { name: marker.color } },
+    [PROP.color]: { select: { name: notionColorName(marker.color) } },
     [PROP.progress]: { number: marker.progress },
     [PROP.byProfile]: {
-      rich_text: toRichText(JSON.stringify(marker.locator.byProfile))
+      rich_text: toRichText(
+        JSON.stringify({
+          version: 2,
+          byProfile: marker.locator.byProfile,
+          ...(marker.contextText === undefined
+            ? {}
+            : { contextText: marker.contextText })
+        })
+      )
     },
     [PROP.createdAt]: {
       date: { start: new Date(marker.createdAt).toISOString() }
@@ -119,8 +126,40 @@ const notionPageSchema = z.object({
   })
 })
 
-function isMarkerColor(value: string): value is MarkerColor {
-  return MARKER_COLORS.some((color) => color === value)
+type NotionColorName = "pink" | "yellow" | "green" | "blue"
+
+/** Notion select option names reject commas, so raw rgba values cannot be stored there. */
+function notionColorName(color: MarkerColor): NotionColorName {
+  switch (color) {
+    case "rgba(255,150,200,0.588235)":
+      return "pink"
+    case "rgba(255,255,35,0.588235)":
+      return "yellow"
+    case "rgba(140,255,35,0.588235)":
+      return "green"
+    case "rgba(150,200,255,0.588235)":
+      return "blue"
+  }
+}
+
+/** Raw rgba names remain readable for databases created before the safe encoding. */
+function markerColorFor(value: string): MarkerColor | null {
+  switch (value) {
+    case "pink":
+    case "rgba(255,150,200,0.588235)":
+      return "rgba(255,150,200,0.588235)"
+    case "yellow":
+    case "rgba(255,255,35,0.588235)":
+      return "rgba(255,255,35,0.588235)"
+    case "green":
+    case "rgba(140,255,35,0.588235)":
+      return "rgba(140,255,35,0.588235)"
+    case "blue":
+    case "rgba(150,200,255,0.588235)":
+      return "rgba(150,200,255,0.588235)"
+    default:
+      return null
+  }
 }
 
 function isFontProfile(value: string): value is FontProfile {
@@ -139,33 +178,30 @@ const profileLocatorSchema = z.object({
   position: z.string().optional()
 })
 
-/**
- * The whole `byProfile` map, so a font change does not lose the profiles the /ric
- * backfill computed. Returns null for a row written before this column existed, which
- * then falls back to rebuilding the captured profile from the flat columns.
- */
-function parseByProfile(
-  json: string
-): { [P in FontProfile]?: ProfileLocator } | null {
-  if (json === "") {
-    return null
-  }
-  let raw: unknown
-  try {
-    raw = JSON.parse(json)
-  } catch {
-    return null
-  }
-  const parsed = z.record(z.string(), profileLocatorSchema).safeParse(raw)
-  if (!parsed.success) {
-    return null
-  }
+interface StoredMarkerPayload {
+  readonly byProfile: { readonly [P in FontProfile]?: ProfileLocator }
+  readonly contextText?: string
+}
 
+const storedMarkerPayloadSchema = z.object({
+  version: z.literal(2),
+  byProfile: z.record(z.string(), profileLocatorSchema),
+  contextText: z.string().optional()
+})
+
+const splitContextPayloadSchema = z.object({
+  version: z.literal(1),
+  byProfile: z.record(z.string(), profileLocatorSchema),
+  contextBefore: z.string().optional(),
+  contextAfter: z.string().optional()
+})
+
+function knownProfiles(
+  entries: Readonly<Record<string, z.infer<typeof profileLocatorSchema>>>
+): { [P in FontProfile]?: ProfileLocator } {
   const byProfile: { [P in FontProfile]?: ProfileLocator } = {}
-  for (const [key, value] of Object.entries(parsed.data)) {
-    if (!isFontProfile(key)) {
-      continue
-    }
+  for (const [key, value] of Object.entries(entries)) {
+    if (!isFontProfile(key)) continue
     byProfile[key] = {
       sFile: value.sFile,
       sidx: value.sidx,
@@ -175,6 +211,45 @@ function parseByProfile(
     }
   }
   return byProfile
+}
+
+/** New rows use an envelope; the raw profile map remains readable for existing rows. */
+function parseStoredMarkerPayload(
+  json: string,
+  selectedText: string
+): StoredMarkerPayload | null {
+  if (json === "") return null
+  let raw: unknown
+  try {
+    raw = JSON.parse(json)
+  } catch {
+    return null
+  }
+
+  const envelope = storedMarkerPayloadSchema.safeParse(raw)
+  if (envelope.success) {
+    return {
+      byProfile: knownProfiles(envelope.data.byProfile),
+      ...(envelope.data.contextText === undefined
+        ? {}
+        : { contextText: envelope.data.contextText })
+    }
+  }
+
+  const splitContext = splitContextPayloadSchema.safeParse(raw)
+  if (splitContext.success) {
+    const before = splitContext.data.contextBefore ?? ""
+    const after = splitContext.data.contextAfter ?? ""
+    return {
+      byProfile: knownProfiles(splitContext.data.byProfile),
+      ...(before === "" && after === ""
+        ? {}
+        : { contextText: `${before}${selectedText}${after}` })
+    }
+  }
+
+  const legacy = z.record(z.string(), profileLocatorSchema).safeParse(raw)
+  return legacy.success ? { byProfile: knownProfiles(legacy.data) } : null
 }
 
 type NotionPageProps = z.infer<typeof notionPageSchema>["properties"]
@@ -250,7 +325,8 @@ export function notionPageToMarker(page: unknown): BwMarker {
   }
 
   const colorName = props[PROP.color].select?.name ?? ""
-  if (!isMarkerColor(colorName)) {
+  const color = markerColorFor(colorName)
+  if (color === null) {
     throw new NotionStoreError(
       t("errorNotionValueUnknown", { id, prop: PROP.color, value: colorName })
     )
@@ -267,9 +343,13 @@ export function notionPageToMarker(page: unknown): BwMarker {
     )
   }
 
+  const selectedText = plain(props[PROP.text].title)
+  const storedPayload = parseStoredMarkerPayload(
+    plain(props[PROP.byProfile].rich_text),
+    selectedText
+  )
   const byProfile: { [P in FontProfile]?: ProfileLocator } =
-    parseByProfile(plain(props[PROP.byProfile].rich_text)) ??
-    legacyByProfile(props, profileName)
+    storedPayload?.byProfile ?? legacyByProfile(props, profileName)
 
   // Not Date.now(): a missing timestamp would otherwise read differently on every
   // fetch, so anything sorting or comparing by age would flap.
@@ -278,9 +358,12 @@ export function notionPageToMarker(page: unknown): BwMarker {
     id,
     bookId: plain(props[PROP.bookId].rich_text),
     bookTitle: plain(props[PROP.bookTitle].rich_text),
-    text: plain(props[PROP.text].title),
+    text: selectedText,
+    ...(storedPayload?.contextText === undefined
+      ? {}
+      : { contextText: storedPayload.contextText }),
     memo: plain(props[PROP.memo].rich_text),
-    color: colorName,
+    color,
     locator: {
       epubcfi: plain(props[PROP.epubcfi].rich_text),
       capturedProfile: profileName,

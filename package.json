@@ -1,15 +1,27 @@
 {
-  "name": "bookwalker-marker",
-  "displayName": "BOOK☆WALKER Marker",
+  "name": "book-walker-marker-plus",
+  "displayName": "Book Walker Marker Plus",
   "version": "0.1.0",
-  "description": "Replace the native BOOK☆WALKER viewer marker feature with extension-managed markers, notes and an LLM chat.",
+  "description": "A Chrome extension for portable Book Walker highlights, notes and passage-scoped LLM chat.",
   "author": "danny",
+  "license": "AGPL-3.0-only",
   "private": true,
+  "keywords": [
+    "bookwalker",
+    "browser-extension",
+    "chrome-extension",
+    "highlights",
+    "plasmo"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "packageManager": "pnpm@11.1.1",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
-    "package": "plasmo package",
+    "package": "node scripts/prepare-package.mjs && plasmo package",
+    "verify:package": "node scripts/verify-build.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -33,7 +45,10 @@
     "@types/node": "22.10.2",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
+    "autoprefixer": "^10.5.4",
     "fake-indexeddb": "^6.2.5",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^3.4.19",
     "typescript": "5.9.3",
     "vitest": "4.1.10"
   },

@@ -9,12 +9,14 @@
  * a rejected field must degrade rather than abort the whole interception.
  */
 import { tryParseRawMarkerItem } from "~/core/bwapi/schema"
-import type {
-  BookContext,
-  FontFace,
-  FontSize,
-  RawMarkerItem,
-  SelectionCaptured
+import {
+  FONT_PROFILES,
+  type BookContext,
+  type FontFace,
+  type FontProfile,
+  type FontSize,
+  type RawMarkerItem,
+  type SelectionCaptured
 } from "~/core/marker/types"
 import type {
   BridgeErrorKind,
@@ -60,6 +62,13 @@ function readBridgeErrorKind(value: unknown): BridgeErrorKind | null {
   return null
 }
 
+function readFontProfile(value: unknown): FontProfile | null {
+  for (const profile of FONT_PROFILES) {
+    if (profile === value) return profile
+  }
+  return null
+}
+
 export function readFontSize(value: unknown): FontSize | null {
   for (const size of FONT_SIZES) {
     if (size === value) return size
@@ -93,6 +102,9 @@ function readSelection(value: unknown): SelectionCaptured | null {
   const sff = readFontFace(prop(obj, "sff"))
   const cfi = readString(prop(obj, "cfi"))
   const text = readString(prop(obj, "text"))
+  const rawContextText = prop(obj, "contextText")
+  const contextText =
+    rawContextText === undefined ? undefined : readString(rawContextText)
   if (
     cid === null ||
     file === null ||
@@ -101,11 +113,22 @@ function readSelection(value: unknown): SelectionCaptured | null {
     sfs === null ||
     sff === null ||
     cfi === null ||
-    text === null
+    text === null ||
+    contextText === null
   ) {
     return null
   }
-  return { cid, file, sidx, eidx, sfs, sff, cfi, text }
+  return {
+    cid,
+    file,
+    sidx,
+    eidx,
+    sfs,
+    sff,
+    cfi,
+    text,
+    ...(contextText === undefined ? {} : { contextText })
+  }
 }
 
 function readBookContext(value: unknown): BookContext | null {
@@ -163,6 +186,13 @@ export function parseContentCommand(data: unknown): ContentCommand | null {
   switch (type) {
     case "content/refresh-markers":
       return { type }
+    case "content/upsert-highlight": {
+      const bookId = readString(prop(obj, "bookId"))
+      const profile = readFontProfile(prop(obj, "profile"))
+      const marker = tryParseRawMarkerItem(prop(obj, "marker"))
+      if (bookId === null || profile === null || marker === null) return null
+      return { type, bookId, profile, marker }
+    }
     case "content/remove-highlight": {
       const markerId = readString(prop(obj, "markerId"))
       if (markerId === null) return null

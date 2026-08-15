@@ -14,6 +14,9 @@ import type {
 } from "~/core/messaging/protocol"
 import type {
   LlmModelsRequest,
+  NotionDatabaseConfigureRequest,
+  NotionDatabaseSchemaRequest,
+  NotionDatabasesRequest,
   PanelFocusRequest,
   SettingsSetRequest
 } from "~/background/message-types"
@@ -33,6 +36,9 @@ declare module "@plasmohq/messaging" {
     "settings-get": undefined
     "settings-set": SettingsSetRequest
     "llm-models": LlmModelsRequest
+    "notion-databases": NotionDatabasesRequest
+    "notion-database-schema": NotionDatabaseSchemaRequest
+    "notion-database-configure": NotionDatabaseConfigureRequest
     "provider-catalog": undefined
     "provider-hosts": ProviderHostsRequest
     "panel-focus": PanelFocusRequest

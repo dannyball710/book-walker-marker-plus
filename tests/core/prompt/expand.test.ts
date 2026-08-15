@@ -5,14 +5,18 @@ import { expandPrompt, type PromptVars } from "~/core/prompt/expand"
 const VARS: PromptVars = {
   text: "テスト本文",
   memo: "{漢字|かんじ}",
-  bookTitle: "サンプル書籍"
+  bookTitle: "サンプル書籍",
+  responseLanguage: "English"
 }
 
 describe("expandPrompt", () => {
   test("substitutes every supported placeholder", () => {
     expect(
-      expandPrompt("《{{bookTitle}}》{{text}} / {{memo}}", VARS)
-    ).toBe("《サンプル書籍》テスト本文 / {漢字|かんじ}")
+      expandPrompt(
+        "《{{bookTitle}}》{{text}} / {{memo}} / {{responseLanguage}}",
+        VARS
+      )
+    ).toBe("《サンプル書籍》テスト本文 / {漢字|かんじ} / English")
   })
 
   test("substitutes repeated placeholders", () => {

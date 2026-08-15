@@ -2,7 +2,7 @@
  * Renders LLM markdown by walking marked's token tree into React elements.
  * No HTML string is ever produced, so model output cannot become markup in a
  * page that holds `chrome.*` privileges. Text leaves keep going through the
- * `{漢字|かんじ}` annotation renderer, so both syntaxes compose.
+ * ruby annotation renderer, so both syntaxes compose.
  */
 
 import { marked, type MarkedToken, type Token, type Tokens } from "marked"

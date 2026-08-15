@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Chrome MV3 extension (Plasmo) that replaces the marker feature of the BOOK☆WALKER browser
+A Chrome MV3 extension (Plasmo) that replaces the marker feature of the Book Walker browser
 reader with its own: highlights and notes in a storage backend of the user's choosing, plus
 an LLM chat scoped to the selected passage. `README.md` covers what it does from the user's
 side; this file covers the parts that take several files to work out.
@@ -35,7 +35,7 @@ single most common way to waste time here — it looks exactly like "my change d
 - **Strict types.** No `any`, no loose dictionaries like `Record<string, any>`. `tsconfig`
   already enables `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` and
   `noUnusedLocals`.
-- **Never write back to the BOOK☆WALKER account.** The upload endpoint is short-circuited,
+- **Never write back to the Book Walker account.** The upload endpoint is short-circuited,
   and deleting a marker only touches our own store. This is settled — do not add a
   "sync back" option.
 - API keys and the Notion token go in `chrome.storage.local`, **never `chrome.storage.sync`**.

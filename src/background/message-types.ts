@@ -4,6 +4,10 @@
  * so any context can import it without pulling in background code.
  */
 import type { BwMarker } from "~/core/marker/types"
+import type {
+  NotionDatabaseSummary,
+  NotionSchemaStatus
+} from "~/core/notion/types"
 import type { ConfigValues } from "~/core/provider/descriptor"
 import type { AppSettings } from "~/core/settings/types"
 
@@ -39,7 +43,8 @@ export interface MarkerDeleteResponse {
 }
 
 export interface PanelFocusRequest {
-  readonly markerId: string
+  /** viewer-side snapshot used immediately while the storage backend is revalidated */
+  readonly marker: BwMarker
 }
 
 export interface LlmModelsRequest {
@@ -50,4 +55,29 @@ export interface LlmModelsRequest {
 
 export interface LlmModelsResponse {
   readonly models: readonly string[]
+}
+
+export interface NotionDatabasesRequest {
+  readonly pat: string
+  readonly query: string
+}
+
+export interface NotionDatabasesResponse {
+  readonly databases: readonly NotionDatabaseSummary[]
+  readonly hasMore: boolean
+}
+
+export interface NotionDatabaseSchemaRequest {
+  readonly pat: string
+  readonly databaseId: string
+}
+
+export interface NotionDatabaseSchemaResponse {
+  readonly status: NotionSchemaStatus
+}
+
+export interface NotionDatabaseConfigureRequest
+  extends NotionDatabaseSchemaRequest {
+  /** Background refuses schema mutation unless the danger confirmation came from UI. */
+  readonly confirmDataLoss: true
 }

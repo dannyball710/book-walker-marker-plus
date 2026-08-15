@@ -16,13 +16,19 @@ export interface ChatMessage {
  * this one.
  */
 export type ChatSubject =
-  | { readonly kind: "marker"; readonly markerId: string }
+  | {
+      readonly kind: "marker"
+      readonly markerId: string
+      /** stable passage key used to carry a draft conversation across its first save */
+      readonly key?: string
+    }
   | {
       readonly kind: "draft"
       readonly key: string
       readonly text: string
       readonly memo: string
       readonly bookTitle: string
+      readonly contextText?: string
     }
 
 /**
@@ -30,7 +36,10 @@ export type ChatSubject =
  * agree on when it is a different one, so the rule lives here rather than twice.
  */
 export function chatSubjectKey(subject: ChatSubject): string {
-  return subject.kind === "marker"
+  if (subject.kind === "draft") {
+    return `passage:${subject.key}`
+  }
+  return subject.key === undefined
     ? `marker:${subject.markerId}`
-    : `draft:${subject.key}`
+    : `passage:${subject.key}`
 }

@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { PENDING_FOCUS_KEY } from "~/background/message-types"
+import { fontProfileOf } from "~/core/bwapi/urls"
 import { t } from "~/core/i18n"
+import { toRawMarkerItem } from "~/core/marker/codec"
 import type { BookContext, BwMarker, MarkerColor } from "~/core/marker/types"
-import type { PanelFocusMessage } from "~/core/messaging/protocol"
+import type { ContentCommand, PanelFocusMessage } from "~/core/messaging/protocol"
 import {
   editorBookId,
   resolveEditorState,
@@ -28,6 +30,8 @@ export interface MarkerDraft {
   readonly color: MarkerColor
 }
 
+export type MarkerSaveStatus = "idle" | "saving" | "created" | "saved"
+
 export interface MarkerSession {
   readonly state: EditorState
   readonly markers: readonly BwMarker[]
@@ -35,6 +39,7 @@ export interface MarkerSession {
   readonly bookContext: BookContext | null
   readonly error: string | null
   readonly busy: boolean
+  readonly saveStatus: MarkerSaveStatus
   readonly select: (id: string) => void
   readonly save: (draft: MarkerDraft) => Promise<void>
   readonly remove: () => Promise<void>
@@ -42,18 +47,58 @@ export interface MarkerSession {
   readonly dismiss: () => Promise<void>
 }
 
+function isMarkerSnapshot(value: unknown): value is BwMarker {
+  if (typeof value !== "object" || value === null) return false
+  if (!("id" in value) || !("bookId" in value) || !("text" in value)) return false
+  if (!("memo" in value) || !("locator" in value)) return false
+  return (
+    typeof value.id === "string" &&
+    typeof value.bookId === "string" &&
+    typeof value.text === "string" &&
+    typeof value.memo === "string" &&
+    typeof value.locator === "object" &&
+    value.locator !== null
+  )
+}
+
 function isPanelFocus(message: unknown): message is PanelFocusMessage {
-  if (typeof message !== "object" || message === null) {
-    return false
-  }
-  if (!("type" in message) || !("markerId" in message)) {
-    return false
-  }
-  return message.type === "panel/focus-marker" && typeof message.markerId === "string"
+  if (typeof message !== "object" || message === null) return false
+  if (!("type" in message) || !("marker" in message)) return false
+  return message.type === "panel/focus-marker" && isMarkerSnapshot(message.marker)
 }
 
 function describe(cause: unknown): string {
   return cause instanceof Error ? cause.message : String(cause)
+}
+
+function viewerUpsertCommand(
+  marker: BwMarker,
+  context: BookContext | null
+): ContentCommand {
+  const preferred =
+    context === null
+      ? marker.locator.capturedProfile
+      : fontProfileOf(context.sfs, context.sff)
+  const preferredItem = toRawMarkerItem(marker, preferred)
+  if (preferredItem !== null) {
+    return {
+      type: "content/upsert-highlight",
+      bookId: marker.bookId,
+      profile: preferred,
+      marker: preferredItem
+    }
+  }
+
+  const captured = marker.locator.capturedProfile
+  const capturedItem = toRawMarkerItem(marker, captured)
+  return capturedItem === null
+    ? { type: "content/refresh-markers" }
+    : {
+        type: "content/upsert-highlight",
+        bookId: marker.bookId,
+        profile: captured,
+        marker: capturedItem
+      }
 }
 
 export function useMarkerSession(): MarkerSession {
@@ -62,7 +107,9 @@ export function useMarkerSession(): MarkerSession {
   const [focusedAtVersion, setFocusedAtVersion] = useState<number | null>(null)
   const [markers, setMarkers] = useState<readonly BwMarker[]>([])
   const [busy, setBusy] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<MarkerSaveStatus>("idle")
   const [error, setError] = useState<string | null>(null)
+  const saveFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const {
     selection,
     context: bookContext,
@@ -83,6 +130,28 @@ export function useMarkerSession(): MarkerSession {
   })
   const bookId = editorBookId(state)
 
+  useEffect(() => {
+    return () => {
+      if (saveFeedbackTimerRef.current !== null) {
+        clearTimeout(saveFeedbackTimerRef.current)
+      }
+    }
+  }, [])
+
+  const updateSaveStatus = useCallback((status: MarkerSaveStatus) => {
+    if (saveFeedbackTimerRef.current !== null) {
+      clearTimeout(saveFeedbackTimerRef.current)
+      saveFeedbackTimerRef.current = null
+    }
+    setSaveStatus(status)
+    if (status === "created" || status === "saved") {
+      saveFeedbackTimerRef.current = setTimeout(() => {
+        setSaveStatus("idle")
+        saveFeedbackTimerRef.current = null
+      }, 1600)
+    }
+  }, [])
+
   const reloadList = useCallback((id: string) => {
     fetchMarkers({ bookId: id, limit: LIST_LIMIT })
       .then(setMarkers)
@@ -94,7 +163,10 @@ export function useMarkerSession(): MarkerSession {
   // wins must clear the key, or the next mount re-focuses a stale marker.
   // The version is stamped here so a selection that arrives afterwards can take the
   // panel back (see resolveEditorState).
-  const focus = useCallback((id: string) => {
+  const focus = useCallback((id: string, snapshot?: BwMarker) => {
+    if (snapshot !== undefined) {
+      setFocusedMarker(snapshot)
+    }
     setFocusedId(id)
     setFocusedAtVersion(versionRef.current)
     void chrome.storage.session.remove(PENDING_FOCUS_KEY)
@@ -103,7 +175,7 @@ export function useMarkerSession(): MarkerSession {
   useEffect(() => {
     const listener = (message: unknown): void => {
       if (isPanelFocus(message)) {
-        focus(message.markerId)
+        focus(message.marker.id, message.marker)
       }
     }
     chrome.runtime.onMessage.addListener(listener)
@@ -115,7 +187,10 @@ export function useMarkerSession(): MarkerSession {
       .get(PENDING_FOCUS_KEY)
       .then((stored) => {
         const pending: unknown = stored[PENDING_FOCUS_KEY]
-        if (typeof pending === "string" && pending !== "") {
+        if (isMarkerSnapshot(pending)) {
+          focus(pending.id, pending)
+        } else if (typeof pending === "string" && pending !== "") {
+          // Compatibility with a pending id written before snapshots were introduced.
           focus(pending)
         }
       })
@@ -157,14 +232,18 @@ export function useMarkerSession(): MarkerSession {
   const select = useCallback(
     (id: string) => {
       setError(null)
-      focus(id)
+      focus(
+        id,
+        markers.find((candidate) => candidate.id === id)
+      )
     },
-    [focus]
+    [focus, markers]
   )
 
   const save = useCallback(
     async (draft: MarkerDraft) => {
       setBusy(true)
+      updateSaveStatus("saving")
       setError(null)
       try {
         if (state.kind === "editing") {
@@ -176,7 +255,8 @@ export function useMarkerSession(): MarkerSession {
           })
           setFocusedMarker(updated)
           reloadList(updated.bookId)
-          await sendToViewerTab({ type: "content/refresh-markers" })
+          await sendToViewerTab(viewerUpsertCommand(updated, bookContext))
+          updateSaveStatus("saved")
           return
         }
         if (state.kind === "pending") {
@@ -185,19 +265,24 @@ export function useMarkerSession(): MarkerSession {
             memo: draft.memo,
             color: draft.color
           })
+          // Keep the editor mounted while the pending selection is consumed. Waiting for
+          // the focused-id fetch would briefly produce an empty state and tear down chat.
+          setFocusedMarker(created)
           focus(created.id)
           reloadList(created.bookId)
           // background consumed the selection; this is what clears it here
           refreshSelection()
-          await sendToViewerTab({ type: "content/refresh-markers" })
+          await sendToViewerTab(viewerUpsertCommand(created, bookContext))
+          updateSaveStatus("created")
         }
       } catch (cause: unknown) {
+        updateSaveStatus("idle")
         setError(describe(cause))
       } finally {
         setBusy(false)
       }
     },
-    [focus, refreshSelection, reloadList, state]
+    [bookContext, focus, refreshSelection, reloadList, state, updateSaveStatus]
   )
 
   const dismiss = useCallback(async () => {
@@ -250,6 +335,7 @@ export function useMarkerSession(): MarkerSession {
     bookContext,
     error: error ?? selectionError,
     busy,
+    saveStatus,
     select,
     save,
     remove,

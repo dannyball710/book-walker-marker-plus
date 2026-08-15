@@ -33,13 +33,18 @@ export interface ChatPortSession {
 }
 
 const chatSubjectSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("marker"), markerId: z.string() }),
+  z.object({
+    kind: z.literal("marker"),
+    markerId: z.string(),
+    key: z.string().optional()
+  }),
   z.object({
     kind: z.literal("draft"),
     key: z.string(),
     text: z.string(),
     memo: z.string(),
-    bookTitle: z.string()
+    bookTitle: z.string(),
+    contextText: z.string().optional()
   })
 ])
 
@@ -49,12 +54,39 @@ const chatPortRequestSchema = z.discriminatedUnion("type", [
     subject: chatSubjectSchema,
     prompt: z.string()
   }),
-  z.object({ type: z.literal("abort") })
+  z.object({ type: z.literal("abort") }),
+  z.object({ type: z.literal("clear") })
 ])
 
 export function parseChatPortRequest(value: unknown): ChatPortRequest | null {
   const parsed = chatPortRequestSchema.safeParse(value)
-  return parsed.success ? parsed.data : null
+  if (!parsed.success) {
+    return null
+  }
+  const request = parsed.data
+  if (request.type !== "start") {
+    return request
+  }
+  const subject: ChatSubject =
+    request.subject.kind === "draft"
+      ? {
+          kind: "draft",
+          key: request.subject.key,
+          text: request.subject.text,
+          memo: request.subject.memo,
+          bookTitle: request.subject.bookTitle,
+          ...(request.subject.contextText === undefined
+            ? {}
+            : { contextText: request.subject.contextText })
+        }
+      : {
+          kind: "marker",
+          markerId: request.subject.markerId,
+          ...(request.subject.key === undefined
+            ? {}
+            : { key: request.subject.key })
+        }
+  return { type: "start", subject, prompt: request.prompt }
 }
 
 const GENERIC_FAILURE = t("errorModelRequestFailed")
@@ -150,6 +182,12 @@ export function createChatPortSession(deps: ChatPortDeps): ChatPortSession {
       if (request.type === "abort") {
         inFlight?.abort()
         inFlight = null
+        return
+      }
+      if (request.type === "clear") {
+        inFlight?.abort()
+        inFlight = null
+        history = []
         return
       }
       void start(request.subject, request.prompt)

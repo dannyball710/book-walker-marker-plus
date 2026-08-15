@@ -25,6 +25,7 @@ export interface ChatStreamController {
    */
   readonly send: (prompt: string, display?: string) => void
   readonly abort: () => void
+  readonly clear: () => void
 }
 
 function isChatMessage(value: unknown): value is ChatMessage {
@@ -138,5 +139,11 @@ export function useChatStream(subject: ChatSubject | null): ChatStreamController
     dispatch({ type: "abort" })
   }, [])
 
-  return { state, send, abort }
+  const clear = useCallback(() => {
+    const request: ChatPortRequest = { type: "clear" }
+    portRef.current?.postMessage(request)
+    dispatch({ type: "history", messages: [] })
+  }, [])
+
+  return { state, send, abort, clear }
 }

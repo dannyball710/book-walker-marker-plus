@@ -4,6 +4,8 @@ export interface PromptVars {
   readonly text: string
   readonly memo: string
   readonly bookTitle: string
+  readonly responseLanguage: string
+  readonly contextText?: string
 }
 
 const PLACEHOLDER = /\{\{\s*([A-Za-z]+)\s*\}\}/g
@@ -18,6 +20,8 @@ export function expandPrompt(template: string, vars: PromptVars): string {
         return vars.memo
       case "bookTitle":
         return vars.bookTitle
+      case "responseLanguage":
+        return vars.responseLanguage
       default:
         return match
     }

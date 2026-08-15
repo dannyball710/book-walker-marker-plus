@@ -1,11 +1,19 @@
 import * as z from "zod"
 
 import { t } from "~/core/i18n"
+import type {
+  NotionDatabaseSummary,
+  NotionSchemaStatus
+} from "~/core/notion/types"
 
 import type { NotionFilter } from "~/storage/providers/notion/filter"
 import { NotionStoreError } from "~/storage/providers/notion/errors"
 import type { NotionProperties } from "~/storage/providers/notion/mapping"
 import type { NotionConfig } from "~/storage/providers/notion/config"
+import {
+  planNotionSchema,
+  type NotionDatabaseProperty
+} from "~/storage/providers/notion/schema"
 import {
   createRequestQueue,
   type AttemptOutcome,
@@ -28,10 +36,37 @@ const pageIdResponseSchema = z.object({
   results: z.array(z.object({ id: z.string() }))
 })
 
+const databaseTitleItemSchema = z.object({ plain_text: z.string() })
+const databasePropertySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.string()
+})
+const databaseSchema = z.object({
+  id: z.string(),
+  title: z.array(databaseTitleItemSchema),
+  url: z.string().nullable().optional(),
+  properties: z.record(z.string(), databasePropertySchema)
+})
+const databaseSearchSchema = z.object({
+  results: z.array(databaseSchema.pick({ id: true, title: true, url: true })),
+  has_more: z.boolean()
+})
+
 export interface NotionPage {
   readonly results: readonly unknown[]
   readonly hasMore: boolean
   readonly nextCursor: string | null
+}
+
+export interface NotionDatabaseSearchResult {
+  readonly databases: readonly NotionDatabaseSummary[]
+  readonly hasMore: boolean
+}
+
+interface NotionClientConfig {
+  readonly pat: string
+  readonly databaseId?: string
 }
 
 function retryAfterSecondsOf(response: Response): number | undefined {
@@ -55,7 +90,45 @@ export class NotionClient {
     }
   })
 
-  constructor(private readonly config: NotionConfig) {}
+  constructor(private readonly config: NotionClientConfig | NotionConfig) {}
+
+  async searchDatabases(query: string): Promise<NotionDatabaseSearchResult> {
+    const trimmed = query.trim()
+    const raw = await this.request("POST", "/search", {
+      filter: { property: "object", value: "database" },
+      sort: { direction: "descending", timestamp: "last_edited_time" },
+      page_size: 100,
+      ...(trimmed === "" ? {} : { query: trimmed })
+    })
+    const parsed = databaseSearchSchema.parse(raw)
+    return {
+      databases: parsed.results.map((database) => ({
+        id: database.id,
+        title: database.title.map((item) => item.plain_text).join(""),
+        url: database.url ?? null
+      })),
+      hasMore: parsed.has_more
+    }
+  }
+
+  async inspectDatabase(databaseId: string): Promise<NotionSchemaStatus> {
+    const database = await this.readDatabase(databaseId)
+    return planNotionSchema(Object.values(database.properties)).status
+  }
+
+  async configureDatabase(databaseId: string): Promise<NotionSchemaStatus> {
+    const database = await this.readDatabase(databaseId)
+    const plan = planNotionSchema(Object.values(database.properties))
+    if (plan.status.compatible) {
+      return plan.status
+    }
+    const updated = databaseSchema.parse(
+      await this.request("PATCH", `/databases/${encodeURIComponent(databaseId)}`, {
+        properties: plan.properties
+      })
+    )
+    return planNotionSchema(Object.values(updated.properties)).status
+  }
 
   async query(
     filter: NotionFilter,
@@ -109,14 +182,26 @@ export class NotionClient {
     await this.request("PATCH", `/pages/${pageId}`, { archived: true })
   }
 
+  private async readDatabase(databaseId: string): Promise<{
+    readonly properties: { readonly [name: string]: NotionDatabaseProperty }
+  }> {
+    return databaseSchema.parse(
+      await this.request("GET", `/databases/${encodeURIComponent(databaseId)}`)
+    )
+  }
+
   private queryPath(): string {
-    return `/databases/${this.config.databaseId}/query`
+    const databaseId = this.config.databaseId
+    if (databaseId === undefined || databaseId === "") {
+      throw new NotionStoreError(t("validationNotionDatabaseId"))
+    }
+    return `/databases/${encodeURIComponent(databaseId)}/query`
   }
 
   private request(
-    method: "POST" | "PATCH",
+    method: "GET" | "POST" | "PATCH",
     path: string,
-    body: unknown,
+    body?: unknown,
     options: { readonly retryServerErrors: boolean } = {
       retryServerErrors: true
     }
@@ -131,7 +216,7 @@ export class NotionClient {
             "Notion-Version": NOTION_VERSION,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify(body)
+          ...(body === undefined ? {} : { body: JSON.stringify(body) })
         })
       } catch (cause) {
         // A dead network is not a rate limit; surface it instead of retrying. Which

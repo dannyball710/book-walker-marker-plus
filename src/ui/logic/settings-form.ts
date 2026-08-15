@@ -1,5 +1,6 @@
 import type { ConfigField, ConfigValues } from "~/core/provider/descriptor"
 import type { ProviderCatalogEntry } from "~/core/messaging/protocol"
+import { DEFAULT_SETTINGS } from "~/core/settings/defaults"
 import type { AppSettings, ProviderSelection } from "~/core/settings/types"
 import { withProviderConfig } from "~/core/settings/types"
 
@@ -62,6 +63,8 @@ export function normalizeSettings(
   return {
     storage: normalizeSelection(settings.storage, catalogFor(catalog, "storage")),
     llm: normalizeSelection(settings.llm, catalogFor(catalog, "llm")),
+    responseLanguage:
+      settings.responseLanguage.trim() || DEFAULT_SETTINGS.responseLanguage,
     prompts: normalizeOrder(
       settings.prompts.filter(
         (preset) => preset.label.trim() !== "" || preset.template.trim() !== ""

@@ -19,6 +19,7 @@ function settingsWith(
   return {
     storage: { active: "idb", configs: [] },
     llm: { active, configs },
+    responseLanguage: "English",
     prompts: []
   }
 }

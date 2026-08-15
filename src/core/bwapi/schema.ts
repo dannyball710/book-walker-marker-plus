@@ -1,5 +1,5 @@
 /**
- * Strict validation for BOOK☆WALKER data on its way *into* our storage.
+ * Strict validation for Book Walker data on its way *into* our storage.
  *
  * Deliberately not applied to whole responses: `/gm` carries the account's full marker
  * list, including markers created elsewhere that this schema cannot model, so validating

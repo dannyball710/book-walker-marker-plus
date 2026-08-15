@@ -85,15 +85,18 @@ describe("settings", () => {
   })
 
   it("persists a configuration both providers accept", async () => {
-    const settings = settingsWith({
-      active: "notion",
-      configs: [
-        {
-          providerId: "notion",
-          values: { pat: NOTION_PAT, databaseId: "db-1" }
-        }
-      ]
-    })
+    const settings: AppSettings = {
+      ...settingsWith({
+        active: "notion",
+        configs: [
+          {
+            providerId: "notion",
+            values: { pat: NOTION_PAT, databaseId: "db-1" }
+          }
+        ]
+      }),
+      responseLanguage: "Brazilian Portuguese"
+    }
 
     const saved: BgResponse<SettingsSetResponse> = await invoke(
       handlers.settingsSet,

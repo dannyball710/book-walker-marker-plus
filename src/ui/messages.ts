@@ -12,6 +12,11 @@ import type {
   BgResult,
   LlmModelsResponse,
   MarkerDeleteResponse,
+  NotionDatabaseConfigureRequest,
+  NotionDatabaseSchemaRequest,
+  NotionDatabaseSchemaResponse,
+  NotionDatabasesRequest,
+  NotionDatabasesResponse,
   MarkerUpsertResponse,
   SettingsGetResponse,
   SettingsSetRequest
@@ -115,6 +120,53 @@ export async function fetchLlmModels(
     body: { providerId, values }
   })
   return unwrap(res).models
+}
+
+export async function searchNotionDatabases(
+  pat: string,
+  query: string
+): Promise<NotionDatabasesResponse> {
+  const res = await sendToBackground<
+    NotionDatabasesRequest,
+    BgResult<NotionDatabasesResponse>
+  >({
+    name: BG_MESSAGE.notionDatabases,
+    body: { pat, query }
+  })
+  return unwrap(res)
+}
+
+export async function inspectNotionDatabase(
+  pat: string,
+  databaseId: string
+): Promise<NotionDatabaseSchemaResponse> {
+  const res = await sendToBackground<
+    NotionDatabaseSchemaRequest,
+    BgResult<NotionDatabaseSchemaResponse>
+  >({
+    name: BG_MESSAGE.notionDatabaseSchema,
+    body: { pat, databaseId }
+  })
+  return unwrap(res)
+}
+
+export async function configureNotionDatabase(
+  pat: string,
+  databaseId: string
+): Promise<NotionDatabaseSchemaResponse> {
+  const body: NotionDatabaseConfigureRequest = {
+    pat,
+    databaseId,
+    confirmDataLoss: true
+  }
+  const res = await sendToBackground<
+    NotionDatabaseConfigureRequest,
+    BgResult<NotionDatabaseSchemaResponse>
+  >({
+    name: BG_MESSAGE.notionDatabaseConfigure,
+    body
+  })
+  return unwrap(res)
 }
 
 export async function fetchMarkers(query: MarkerQuery): Promise<readonly BwMarker[]> {

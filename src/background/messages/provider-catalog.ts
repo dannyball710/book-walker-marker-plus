@@ -18,7 +18,10 @@ function baseEntry(
     fields: descriptor.fields,
     // the default configuration's origins; a user-typed endpoint adds to these in the UI
     hosts: descriptor.hostsFor({}),
-    ...(descriptor.docsUrl === undefined ? {} : { docsUrl: descriptor.docsUrl })
+    ...(descriptor.docsUrl === undefined ? {} : { docsUrl: descriptor.docsUrl }),
+    ...(descriptor.optionsTool === undefined
+      ? {}
+      : { optionsTool: descriptor.optionsTool })
   }
 }
 

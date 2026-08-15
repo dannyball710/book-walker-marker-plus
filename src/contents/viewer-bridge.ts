@@ -6,13 +6,14 @@
 import type { PlasmoCSConfig } from "plasmo"
 
 import type { BwEndpoint, CriQuery } from "~/core/bwapi/urls"
-import { classifyBwApiUrl, parseCriQuery } from "~/core/bwapi/urls"
+import { buildCriUrl, classifyBwApiUrl, parseCriQuery } from "~/core/bwapi/urls"
 import type { FontFace, RawMarkerItem } from "~/core/marker/types"
 import type { BridgeErrorKind, BridgeToUiMessage } from "~/core/messaging/protocol"
 import { BRIDGE_SOURCE } from "~/core/messaging/protocol"
 
 import { parseUiToBridgeMessage, readStringProp } from "~/viewer/bridge-protocol"
 import { mergeGetMarkerResponse } from "~/viewer/gm-merge"
+import { extractSelectionContext } from "~/viewer/selection-context"
 import { readBrowserId, readCidFromLocation, readViewerFontSize } from "~/viewer/page-state"
 
 // The `*` already covers the version segment (`03/30`), so this stays version-agnostic
@@ -30,6 +31,9 @@ const VIEWER_POLL_INTERVAL_MS = 200
 /** The viewer opens its dialog some time after /cri answers, so it is waited for. */
 const DIALOG_DISMISS_TIMEOUT_MS = 2000
 const DIALOG_POLL_INTERVAL_MS = 100
+const CONTEXT_WINDOW_CHARS = 50
+const CONTEXT_REGION_MARGIN = 32
+const CONTEXT_FETCH_TIMEOUT_MS = 800
 
 const CANCEL_LABELS: readonly string[] = ["cancel", "キャンセル", "取消"]
 
@@ -47,6 +51,7 @@ const requests = new WeakMap<XMLHttpRequest, RequestRecord>()
 const pendingInjections = new Map<string, (markers: readonly RawMarkerItem[]) => void>()
 
 let injectionSeq = 0
+let selectionSeq = 0
 let userToken: string | null = null
 let bookTitle: string | null = null
 let fontFace: FontFace = "default"
@@ -252,14 +257,49 @@ function watchCri(xhr: XMLHttpRequest, url: string): void {
   postBookContextIfReady()
   xhr.addEventListener("load", () => {
     if (xhr.status !== 200) return
-    postSelection(xhr, query)
+    void postSelection(xhr, query)
     // Runs whether or not the selection could be read: the viewer opens its dialog for
     // this selection either way, and the reader must not be left with it stuck open.
     dismissMarkerDialog()
   })
 }
 
-function postSelection(xhr: XMLHttpRequest, query: CriQuery): void {
+async function fetchSelectionContext(
+  query: CriQuery,
+  selectedText: string
+): Promise<string> {
+  const contextStart = Math.max(0, query.sidx - CONTEXT_REGION_MARGIN)
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), CONTEXT_FETCH_TIMEOUT_MS)
+  try {
+    const response = await nativeFetch.call(
+      window,
+      buildCriUrl({
+        ...query,
+        sidx: contextStart,
+        eidx: query.eidx + CONTEXT_REGION_MARGIN
+      }),
+      { signal: controller.signal, credentials: "include" }
+    )
+    if (!response.ok) return selectedText
+    const body: unknown = await response.json()
+    const expandedText = readStringProp(body, "text")
+    if (expandedText === null) return selectedText
+    return extractSelectionContext(
+      expandedText,
+      selectedText,
+      query.sidx - contextStart,
+      CONTEXT_WINDOW_CHARS
+    )
+  } catch {
+    return selectedText
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+async function postSelection(xhr: XMLHttpRequest, query: CriQuery): Promise<void> {
+  const seq = (selectionSeq += 1)
   try {
     const body = responseBodyOf(xhr)
     const cfi = readStringProp(body, "cfi")
@@ -268,6 +308,8 @@ function postSelection(xhr: XMLHttpRequest, query: CriQuery): void {
       reportError("selection-failed", "/cri response carried no cfi or text")
       return
     }
+    const contextText = await fetchSelectionContext(query, text)
+    if (seq !== selectionSeq) return
     postToUi({
       source: BRIDGE_SOURCE,
       type: "selection",
@@ -279,7 +321,8 @@ function postSelection(xhr: XMLHttpRequest, query: CriQuery): void {
         sfs: query.sfs,
         sff: query.sff,
         cfi,
-        text
+        text,
+        contextText
       }
     })
   } catch (error) {

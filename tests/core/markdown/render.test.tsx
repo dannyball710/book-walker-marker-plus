@@ -68,16 +68,15 @@ describe("MarkdownText element mapping", () => {
 describe("MarkdownText ruby annotations", () => {
   test("renders ruby inside inline formatting instead of dropping either", () => {
     expect(html("**{漢字|かんじ}**")).toContain(
-      "<strong><span><ruby>漢字<rt>かんじ</rt></ruby></span></strong>"
+      '<strong><span><ruby data-bwm-ruby="{漢字|かんじ}">漢字<rt>かんじ</rt></ruby></span></strong>'
     )
   })
 
   test("applies ruby to text leaves in every block, not only paragraphs", () => {
-    expect(html("# {漢字|かんじ}")).toContain("<ruby>漢字<rt>かんじ</rt></ruby>")
-    expect(html("- {漢字|かんじ}")).toContain("<ruby>漢字<rt>かんじ</rt></ruby>")
-    expect(html("| {漢字|かんじ} |\n| --- |\n| a |")).toContain(
-      "<ruby>漢字<rt>かんじ</rt></ruby>"
-    )
+    const ruby = '<ruby data-bwm-ruby="{漢字|かんじ}">漢字<rt>かんじ</rt></ruby>'
+    expect(html("# {漢字|かんじ}")).toContain(ruby)
+    expect(html("- {漢字|かんじ}")).toContain(ruby)
+    expect(html("| {漢字|かんじ} |\n| --- |\n| a |")).toContain(ruby)
   })
 
   // Markdown claims `\{` first, so the ruby parser never sees its own escape;

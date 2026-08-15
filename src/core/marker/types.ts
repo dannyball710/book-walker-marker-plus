@@ -1,5 +1,5 @@
 /**
- * Wire format of the BOOK☆WALKER browserWebApi plus the extension's own model.
+ * Wire format of the Book Walker browserWebApi plus the extension's own model.
  */
 
 /** `${sfs}_${sff}`, e.g. 'normal_default' */
@@ -103,7 +103,9 @@ export interface BwMarker {
   readonly bookTitle: string
   /** original text from /cri, without ruby */
   readonly text: string
-  /** user note, may contain {漢字|かんじ} ruby annotations */
+  /** one contiguous window of up to 50 characters containing the selected text */
+  readonly contextText?: string
+  /** user note, which may contain ruby annotations */
   readonly memo: string
   readonly color: MarkerColor
   readonly locator: MarkerLocator
@@ -147,4 +149,5 @@ export interface SelectionCaptured {
   readonly sff: FontFace
   readonly cfi: string
   readonly text: string
+  readonly contextText?: string
 }

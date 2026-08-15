@@ -1,7 +1,7 @@
 {
-  "extensionName": { "message": "BOOK☆WALKER Marker" },
+  "extensionName": { "message": "Book Walker Marker Plus" },
   "extensionDescription": {
-    "message": "Replaces the BOOK☆WALKER viewer's built-in marker with markers, notes and an LLM chat the extension owns."
+    "message": "Replaces the Book Walker viewer's built-in marker with markers, notes and an LLM chat the extension owns."
   },
 
   "commonListSeparator": { "message": ", " },
@@ -12,7 +12,11 @@
   "commonSettings": { "message": "Settings" },
   "commonLoading": { "message": "Loading…" },
 
-  "optionsTitle": { "message": "BOOK☆WALKER Marker settings" },
+  "optionsEyebrow": { "message": "Reading workspace" },
+  "optionsTitle": { "message": "Book Walker Marker Plus settings" },
+  "optionsSubtitle": {
+    "message": "Choose where your notes live, connect an AI model, and shape the shortcuts that stay beside your book."
+  },
   "optionsLoading": { "message": "Loading settings…" },
   "optionsLoadFailed": {
     "message": "Could not load settings: $reason$",
@@ -24,9 +28,13 @@
   "optionsReload": { "message": "Try again" },
   "optionsStorageLegend": { "message": "Storage" },
   "optionsStorageNote": {
-    "message": "Markers live in the store you pick here only. The two never sync, and switching does not move them. This extension never writes back to your BOOK☆WALKER account."
+    "message": "Markers live in the store you pick here only. The two never sync, and switching does not move them. This extension never writes back to your Book Walker account."
   },
   "optionsLlmLegend": { "message": "LLM" },
+  "optionsLlmNote": {
+    "message": "Connect the model used for passage-specific questions. Switching providers does not affect saved markers."
+  },
+  "optionsPermissionTitle": { "message": "Network access" },
   "optionsSecretsLocalNote": {
     "message": "Keys stay on this computer and are never synced to your other devices."
   },
@@ -39,12 +47,19 @@
     "placeholders": { "origins": { "content": "$1" } }
   },
   "optionsSaveButton": { "message": "Save settings" },
+  "optionsSaveHint": { "message": "Changes are applied after you save." },
+  "optionsSaving": { "message": "Saving…" },
   "optionsSaved": { "message": "Saved. It takes effect right away." },
   "optionsSavedLlmIncomplete": { "message": "Saved. The LLM is not configured yet." },
   "optionsNotSavedFields": { "message": "Not saved (see the field problems above)" },
   "optionsNotSavedPermission": { "message": "Not saved (permission denied)" },
 
   "providersEmpty": { "message": "No provider is available." },
+  "providerSelected": { "message": "Selected" },
+  "providerConfigure": {
+    "message": "Configure $label$",
+    "placeholders": { "label": { "content": "$1" } }
+  },
   "providerLoadModels": { "message": "Load model list" },
   "providerModelsLoaded": {
     "message": "Loaded $count$ models.",
@@ -71,17 +86,20 @@
     "placeholders": { "id": { "content": "$1" } }
   },
 
+  "fieldRequired": { "message": "Required" },
   "fieldSelectNone": { "message": "(not selected)" },
   "fieldSecretHide": { "message": "Hide" },
   "fieldSecretShow": { "message": "Show" },
 
   "promptsLegend": { "message": "Saved prompts" },
+  "promptsPlaceholdersLabel": { "message": "Available placeholders" },
   "promptsIntro": {
     "message": "These buttons appear above the chatbot in the side panel. Placeholders: "
   },
   "promptsVarText": { "message": " (marker text)" },
   "promptsVarMemo": { "message": " (note)" },
   "promptsVarBookTitle": { "message": " (book title)" },
+  "promptsVarResponseLanguage": { "message": " (response language setting)" },
   "promptsEmpty": { "message": "No prompts yet." },
   "promptLabelField": { "message": "Button text" },
   "promptTemplateField": { "message": "Prompt body" },
@@ -89,52 +107,97 @@
   "promptMoveDown": { "message": "Move down" },
   "promptAdd": { "message": "Add prompt" },
   "promptNewLabel": { "message": "New prompt" },
+  "assistantResponseLanguageLabel": { "message": "Response language" },
+  "assistantResponseLanguageHelp": {
+    "message": "Used by the assistant and the {{responseLanguage}} prompt placeholder. Leave it blank to use the browser language."
+  },
+  "assistantResponseLanguage": { "message": "English" },
 
   "promptPresetTranslateLabel": { "message": "Translate" },
   "promptPresetTranslateTemplate": {
-    "message": "Translate this Japanese passage from “{{bookTitle}}” into English, keeping the tone of the original:\n\n{{text}}"
+    "message": "Translate this Japanese passage from “{{bookTitle}}” into {{responseLanguage}}, keeping the tone of the original:\n\n{{text}}"
   },
   "promptPresetGrammarLabel": { "message": "Explain grammar" },
   "promptPresetGrammarTemplate": {
-    "message": "Explain the grammar of this Japanese passage, breaking down the particles and verb forms sentence by sentence:\n\n{{text}}"
+    "message": "In {{responseLanguage}}, explain the grammar of this Japanese passage, breaking down the particles and verb forms sentence by sentence:\n\n{{text}}"
   },
   "promptPresetReadingLabel": { "message": "Kanji readings" },
   "promptPresetReadingTemplate": {
-    "message": "Give the reading of every kanji in this Japanese passage, using the {漢字|かんじ} format:\n\n{{text}}"
+    "message": "Answer in {{responseLanguage}} and give the reading of every kanji in this Japanese passage, using the {漢字|かんじ} format:\n\n{{text}}"
   },
 
-  "markerSectionTitle": { "message": "MARKER" },
+  "panelNoBook": { "message": "Open a Book Walker book to begin" },
+  "panelToolsLabel": { "message": "Reading tools" },
+  "panelWorkspaceTab": { "message": "Current passage" },
+
+  "markerSectionTitle": { "message": "Marker" },
+  "markerLibraryTab": { "message": "Book markers" },
+  "markerSearchLabel": { "message": "Search book markers" },
+  "markerSearchPlaceholder": { "message": "Search passage or note…" },
+  "markerSearchEmpty": { "message": "No matching markers." },
+  "markerLibraryEmpty": { "message": "No markers in this book." },
+  "markerEmptyTitle": { "message": "Your margin is ready" },
   "markerEmptyHint": {
     "message": "Select text in the viewer, or tap an existing marker."
   },
   "markerCreate": { "message": "Create marker" },
+  "markerCreating": { "message": "Creating…" },
+  "markerCreated": { "message": "Created" },
+  "markerSaving": { "message": "Saving…" },
+  "markerSaved": { "message": "Saved" },
+  "markerEditTitle": { "message": "Edit marker" },
+  "markerComposeEyebrow": { "message": "Keep it in the margin" },
+  "markerComposeHint": {
+    "message": "Add an assistant reply, then edit it into the note you want to keep."
+  },
   "markerListHeading": {
     "message": "MARKERS IN THIS BOOK ($count$)",
     "placeholders": { "count": { "content": "$1" } }
   },
+  "markerExcerptLabel": { "message": "Selected passage" },
+  "markerMemoLabel": { "message": "Note" },
   "markerMemoHint": {
     "message": "Notes take readings as {漢字|かんじ}; they render as ruby once you leave the box."
   },
   "markerMemoPlaceholder": { "message": "Write a note…" },
   "markerDiscard": { "message": "Discard" },
+  "markerDeletePrompt": { "message": "Delete this marker? This cannot be undone." },
   "markerDeleteConfirm": { "message": "Confirm delete" },
-  "markerColorGroupLabel": { "message": "marker colour" },
+  "markerColorGroupLabel": { "message": "Marker colour" },
+  "markerColorPink": { "message": "Pink" },
+  "markerColorYellow": { "message": "Yellow" },
+  "markerColorGreen": { "message": "Green" },
+  "markerColorBlue": { "message": "Blue" },
+  "markerLibraryEyebrow": { "message": "This book" },
   "markerNotFound": { "message": "No such marker; it may have been deleted." },
   "markerDeletedNeedsReload": {
     "message": "Marker deleted. The highlight goes away after you reload the viewer."
   },
 
-  "chatSectionTitle": { "message": "CHATBOT" },
+  "chatContextEyebrow": { "message": "Passage assistant" },
+  "chatSectionTitle": { "message": "Chat" },
+  "chatPrivateLabel": { "message": "Session only" },
+  "chatEmptyTitle": { "message": "Choose a passage first" },
   "chatPickMarker": { "message": "Pick a marker to ask about it." },
+  "chatQuickPrompts": { "message": "Quick prompts" },
+  "chatReadyHint": {
+    "message": "Use a quick prompt or ask your own question about this passage."
+  },
   "chatNotStored": {
     "message": "The conversation is not stored; it goes when you close the panel or switch passages."
   },
   "chatRoleUser": { "message": "you" },
   "chatRoleAssistant": { "message": "assistant" },
+  "chatMessageExpand": { "message": "Expand message" },
+  "chatMessageCollapse": { "message": "Collapse message" },
   "chatGenerating": { "message": "Generating…" },
   "chatInputPlaceholder": { "message": "Ask about this passage…" },
+  "chatKeyboardHint": { "message": "Ctrl / ⌘ + Enter to send" },
   "chatSend": { "message": "Send" },
   "chatAbort": { "message": "Stop" },
+  "chatClear": { "message": "Clear conversation" },
+  "chatAddToNote": { "message": "Add to note" },
+  "chatAddedToNote": { "message": "Added to note" },
   "chatPortDisconnected": {
     "message": "The connection dropped and the reply was cut off. Send it again."
   },
@@ -234,6 +297,58 @@
   },
 
   "storageIdbLabel": { "message": "This device (IndexedDB)" },
+  "notionPatLabel": { "message": "Integration token" },
+  "notionDatabaseFieldLabel": { "message": "Database" },
+  "notionDatabasePickerTitle": { "message": "Choose a database" },
+  "notionDatabaseSearchLabel": { "message": "Search accessible Notion databases" },
+  "notionDatabaseSearchPlaceholder": { "message": "Search database name…" },
+  "notionDatabaseSearchButton": { "message": "Search" },
+  "notionDatabaseSearchEmpty": { "message": "No accessible database matched." },
+  "notionDatabaseSearchMore": { "message": "More results exist. Narrow the database name and search again." },
+  "notionDatabaseUntitled": { "message": "Untitled database" },
+  "notionDatabaseSelected": { "message": "Selected database" },
+  "notionPermissionDenied": { "message": "Notion access was not granted." },
+  "notionSchemaCheck": { "message": "Check fields" },
+  "notionSchemaChecking": { "message": "Checking database fields…" },
+  "notionSchemaConfiguring": { "message": "Configuring database fields…" },
+  "notionSchemaCompatible": { "message": "The database fields are compatible." },
+  "notionSchemaConfigured": { "message": "The required fields are configured." },
+  "notionTechnicalFieldsTitle": { "message": "Hide technical fields in Notion" },
+  "notionTechnicalFieldsBody": { "message": "The Notion API cannot change view visibility. Open the database and hide these fields in each view where readers should not see them." },
+  "notionOpenDatabase": { "message": "Open in Notion" },
+  "notionSchemaIncompatible": { "message": "The database fields do not match." },
+  "notionSchemaMissing": {
+    "message": "Missing $property$ ($type$)",
+    "placeholders": {
+      "property": { "content": "$1" },
+      "type": { "content": "$2" }
+    }
+  },
+  "notionSchemaTitleRename": {
+    "message": "Rename title field “$current$” to “$property$”",
+    "placeholders": {
+      "current": { "content": "$1" },
+      "property": { "content": "$2" }
+    }
+  },
+  "notionSchemaWrongType": {
+    "message": "$property$: change $current$ to $expected$",
+    "placeholders": {
+      "property": { "content": "$1" },
+      "current": { "content": "$2" },
+      "expected": { "content": "$3" }
+    }
+  },
+  "notionSchemaConfigureButton": { "message": "Configure required fields" },
+  "notionConfigureDangerTitle": { "message": "This can permanently destroy database data" },
+  "notionConfigureDangerBody": { "message": "The extension may rename fields, change property types, or delete a same-name field before configuring the required schema. Existing values can become unreadable or be permanently deleted. Notion provides no rollback for this operation. Back up the database first." },
+  "notionConfigureConfirm": { "message": "Configure fields anyway" },
+  "notionConfigureConfirmationRequired": { "message": "Confirm the data-loss warning before configuring Notion fields." },
+  "notionPropertyTypeTitle": { "message": "Title" },
+  "notionPropertyTypeRichText": { "message": "Text" },
+  "notionPropertyTypeNumber": { "message": "Number" },
+  "notionPropertyTypeSelect": { "message": "Select" },
+  "notionPropertyTypeDate": { "message": "Date" },
   "notionPatHelp": {
     "message": "Share the target database with this integration. Notion gets noticeably slower once you have many markers."
   },

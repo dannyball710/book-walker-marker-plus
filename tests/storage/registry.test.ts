@@ -18,6 +18,7 @@ function settingsWith(
   return {
     storage: { active, configs },
     llm: { active: "openrouter", configs: [] },
+    responseLanguage: "English",
     prompts: []
   }
 }

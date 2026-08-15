@@ -13,6 +13,7 @@ export const notionMarkerStoreDescriptor: MarkerStoreDescriptor = {
   label: NOTION_LABEL,
   fields: notionFields,
   docsUrl: "https://developers.notion.com/docs/create-a-notion-integration",
+  optionsTool: "notion-database",
   validate: (values) => notionConfigCodec.validate(values),
   // fixed endpoint: the database id is a path segment, not a host
   hostsFor: () => ["https://api.notion.com/*"],

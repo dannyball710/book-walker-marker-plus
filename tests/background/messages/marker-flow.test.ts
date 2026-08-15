@@ -174,6 +174,29 @@ describe("creating a marker", () => {
     })
   })
 
+  it("stores the captured text immediately before and after the selection", async () => {
+    await reportContext()
+    const contextualSelection = {
+      ...selection,
+      contextText: `直前の十文字${selection.text}直後の十文字`
+    }
+    const response: BgResponse<MarkerCreateResponse> = await invoke(
+      handlers.markerCreate,
+      {
+        name: "marker-create",
+        body: {
+          selection: contextualSelection,
+          memo: MEMO,
+          color: COLOR
+        }
+      }
+    )
+
+    expect(expectOk(response).marker).toMatchObject({
+      contextText: `直前の十文字${selection.text}直後の十文字`
+    })
+  })
+
   it("omits the position hint, which only the viewer's own engine can produce", async () => {
     const locator = (await createMarker()).locator.byProfile.normal_default
 

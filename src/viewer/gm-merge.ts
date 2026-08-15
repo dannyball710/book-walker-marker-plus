@@ -3,7 +3,7 @@
  *
  * The viewer's markers are appended to, never re-encoded. Our schema models only
  * the browser-created shape, so validating them would both strip unmodelled fields
- * and let a single foreign marker (one made in the BOOK☆WALKER app, whose appendix
+ * and let a single foreign marker (one made in the Book Walker app, whose appendix
  * has no `browser`) abandon the whole injection. Only the envelope is checked.
  */
 import type { RawMarkerItem } from "~/core/marker/types"

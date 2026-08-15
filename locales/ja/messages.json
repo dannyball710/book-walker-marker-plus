@@ -1,7 +1,7 @@
 {
-  "extensionName": { "message": "BOOK☆WALKER Marker" },
+  "extensionName": { "message": "Book Walker Marker Plus" },
   "extensionDescription": {
-    "message": "BOOK☆WALKER ビューアの標準マーカーを、拡張機能が管理するマーカー・メモ・LLM チャットで置き換えます。"
+    "message": "Book Walker ビューアの標準マーカーを、拡張機能が管理するマーカー・メモ・LLM チャットで置き換えます。"
   },
 
   "commonListSeparator": { "message": "、" },
@@ -12,7 +12,11 @@
   "commonSettings": { "message": "設定" },
   "commonLoading": { "message": "読み込み中…" },
 
-  "optionsTitle": { "message": "BOOK☆WALKER Marker 設定" },
+  "optionsEyebrow": { "message": "読書ワークスペース" },
+  "optionsTitle": { "message": "Book Walker Marker Plus 設定" },
+  "optionsSubtitle": {
+    "message": "マーカーの保存先と AI モデルを設定し、読書中に使うクイックプロンプトを整えます。"
+  },
   "optionsLoading": { "message": "設定を読み込み中…" },
   "optionsLoadFailed": {
     "message": "設定の読み込みに失敗しました：$reason$",
@@ -24,9 +28,13 @@
   "optionsReload": { "message": "再読み込み" },
   "optionsStorageLegend": { "message": "保存先" },
   "optionsStorageNote": {
-    "message": "マーカーはここで選んだ保存先にのみ入ります。両者は同期せず、切り替えても移動しません。BOOK☆WALKER のアカウントに書き戻すことはありません。"
+    "message": "マーカーはここで選んだ保存先にのみ入ります。両者は同期せず、切り替えても移動しません。Book Walker のアカウントに書き戻すことはありません。"
   },
   "optionsLlmLegend": { "message": "LLM" },
+  "optionsLlmNote": {
+    "message": "選んだ箇所について質問するモデルを接続します。プロバイダーを替えても保存済みのマーカーには影響しません。"
+  },
+  "optionsPermissionTitle": { "message": "ネットワークアクセス" },
   "optionsSecretsLocalNote": {
     "message": "キーはこの端末にのみ残り、他の端末には同期されません。"
   },
@@ -39,12 +47,19 @@
     "placeholders": { "origins": { "content": "$1" } }
   },
   "optionsSaveButton": { "message": "設定を保存" },
+  "optionsSaveHint": { "message": "変更は保存後に反映されます。" },
+  "optionsSaving": { "message": "保存中…" },
   "optionsSaved": { "message": "保存しました。すぐに反映されます。" },
   "optionsSavedLlmIncomplete": { "message": "保存しました。LLM の設定は未完了です。" },
   "optionsNotSavedFields": { "message": "未保存（上の項目の問題を確認）" },
   "optionsNotSavedPermission": { "message": "未保存（権限が拒否されました）" },
 
   "providersEmpty": { "message": "利用できるプロバイダーがありません。" },
+  "providerSelected": { "message": "選択中" },
+  "providerConfigure": {
+    "message": "$label$ を設定",
+    "placeholders": { "label": { "content": "$1" } }
+  },
   "providerLoadModels": { "message": "モデル一覧を取得" },
   "providerModelsLoaded": {
     "message": "$count$ 件のモデルを取得しました。",
@@ -71,17 +86,20 @@
     "placeholders": { "id": { "content": "$1" } }
   },
 
+  "fieldRequired": { "message": "必須" },
   "fieldSelectNone": { "message": "（未選択）" },
   "fieldSecretHide": { "message": "隠す" },
   "fieldSecretShow": { "message": "表示" },
 
   "promptsLegend": { "message": "よく使うプロンプト" },
+  "promptsPlaceholdersLabel": { "message": "利用できるプレースホルダー" },
   "promptsIntro": {
     "message": "これらのボタンはサイドパネルのチャットの上に並びます。使えるプレースホルダー："
   },
   "promptsVarText": { "message": "（マーカーの原文）" },
   "promptsVarMemo": { "message": "（メモ）" },
   "promptsVarBookTitle": { "message": "（書名）" },
+  "promptsVarResponseLanguage": { "message": "（回答言語の設定）" },
   "promptsEmpty": { "message": "プロンプトがまだありません。" },
   "promptLabelField": { "message": "ボタンの文字" },
   "promptTemplateField": { "message": "プロンプト本文" },
@@ -89,52 +107,97 @@
   "promptMoveDown": { "message": "下へ" },
   "promptAdd": { "message": "プロンプトを追加" },
   "promptNewLabel": { "message": "新しいプロンプト" },
+  "assistantResponseLanguageLabel": { "message": "回答言語" },
+  "assistantResponseLanguageHelp": {
+    "message": "読書アシスタントと {{responseLanguage}} プロンプトプレースホルダーに使います。空欄の場合はブラウザーの言語になります。"
+  },
+  "assistantResponseLanguage": { "message": "日本語" },
 
   "promptPresetTranslateLabel": { "message": "訳す" },
   "promptPresetTranslateTemplate": {
-    "message": "『{{bookTitle}}』のこの一節を、原文の語調を保ったまま現代日本語に言い換えてください：\n\n{{text}}"
+    "message": "『{{bookTitle}}』のこの一節を、原文の語調を保ちながら {{responseLanguage}} で現代語に言い換えてください：\n\n{{text}}"
   },
   "promptPresetGrammarLabel": { "message": "文法を解説" },
   "promptPresetGrammarTemplate": {
-    "message": "この一節の文法構造を、助詞と動詞の活用に分けて一文ずつ解説してください：\n\n{{text}}"
+    "message": "{{responseLanguage}} で、この一節の文法構造を助詞と動詞の活用に分けて一文ずつ解説してください：\n\n{{text}}"
   },
   "promptPresetReadingLabel": { "message": "漢字の読み" },
   "promptPresetReadingTemplate": {
-    "message": "この一節の漢字すべてに読みを付けてください（{漢字|かんじ} の形式で出力）：\n\n{{text}}"
+    "message": "{{responseLanguage}} で答え、この一節の漢字すべてに読みを付けてください（{漢字|かんじ} の形式で出力）：\n\n{{text}}"
   },
 
+  "panelNoBook": { "message": "Book Walker の本を開くと開始できます" },
+  "panelToolsLabel": { "message": "読書ツール" },
+  "panelWorkspaceTab": { "message": "現在の箇所" },
+
   "markerSectionTitle": { "message": "マーカー" },
+  "markerLibraryTab": { "message": "この本のマーカー" },
+  "markerSearchLabel": { "message": "この本のマーカーを検索" },
+  "markerSearchPlaceholder": { "message": "本文またはメモを検索…" },
+  "markerSearchEmpty": { "message": "一致するマーカーはありません。" },
+  "markerLibraryEmpty": { "message": "この本にはまだマーカーがありません。" },
+  "markerEmptyTitle": { "message": "余白の準備ができました" },
   "markerEmptyHint": {
     "message": "ビューアで文字を選択するか、既存のマーカーをタップしてください。"
   },
   "markerCreate": { "message": "マーカーを作成" },
+  "markerCreating": { "message": "作成中…" },
+  "markerCreated": { "message": "作成しました" },
+  "markerSaving": { "message": "保存中…" },
+  "markerSaved": { "message": "保存しました" },
+  "markerEditTitle": { "message": "マーカーを編集" },
+  "markerComposeEyebrow": { "message": "余白に残す" },
+  "markerComposeHint": {
+    "message": "AI の返信をメモに加えてから、残したい内容に整えられます。"
+  },
   "markerListHeading": {
     "message": "この本のマーカー（$count$）",
     "placeholders": { "count": { "content": "$1" } }
   },
+  "markerExcerptLabel": { "message": "選択した箇所" },
+  "markerMemoLabel": { "message": "メモ" },
   "markerMemoHint": {
     "message": "メモには {漢字|かんじ} の形式で読みを書けます。編集を離れるとルビとして表示されます。"
   },
   "markerMemoPlaceholder": { "message": "メモを入力…" },
   "markerDiscard": { "message": "破棄" },
+  "markerDeletePrompt": { "message": "このマーカーを削除しますか？元に戻すことはできません。" },
   "markerDeleteConfirm": { "message": "削除を確定" },
   "markerColorGroupLabel": { "message": "マーカーの色" },
+  "markerColorPink": { "message": "ピンク" },
+  "markerColorYellow": { "message": "黄" },
+  "markerColorGreen": { "message": "緑" },
+  "markerColorBlue": { "message": "青" },
+  "markerLibraryEyebrow": { "message": "この本" },
   "markerNotFound": { "message": "このマーカーは見つかりません。削除された可能性があります。" },
   "markerDeletedNeedsReload": {
     "message": "マーカーを削除しました。画面上の線はビューアを再読み込みすると消えます。"
   },
 
+  "chatContextEyebrow": { "message": "読書アシスタント" },
   "chatSectionTitle": { "message": "チャット" },
+  "chatPrivateLabel": { "message": "このセッションのみ" },
+  "chatEmptyTitle": { "message": "先に箇所を選んでください" },
   "chatPickMarker": { "message": "マーカーを選ぶと、それについて質問できます。" },
+  "chatQuickPrompts": { "message": "クイックプロンプト" },
+  "chatReadyHint": {
+    "message": "クイックプロンプトを選ぶか、この箇所について自由に質問してください。"
+  },
   "chatNotStored": {
     "message": "会話は保存されません。パネルを閉じるか別の箇所に移ると消えます。"
   },
   "chatRoleUser": { "message": "あなた" },
   "chatRoleAssistant": { "message": "アシスタント" },
+  "chatMessageExpand": { "message": "メッセージを展開" },
+  "chatMessageCollapse": { "message": "メッセージを折りたたむ" },
   "chatGenerating": { "message": "生成中…" },
   "chatInputPlaceholder": { "message": "この箇所について質問…" },
+  "chatKeyboardHint": { "message": "Ctrl / ⌘ + Enter で送信" },
   "chatSend": { "message": "送信" },
   "chatAbort": { "message": "中止" },
+  "chatClear": { "message": "会話をクリア" },
+  "chatAddToNote": { "message": "メモに追加" },
+  "chatAddedToNote": { "message": "メモに追加済み" },
   "chatPortDisconnected": {
     "message": "接続が切れ、返信は中断されました。もう一度送信してください。"
   },
@@ -236,6 +299,58 @@
   },
 
   "storageIdbLabel": { "message": "この端末（IndexedDB）" },
+  "notionPatLabel": { "message": "インテグレーショントークン" },
+  "notionDatabaseFieldLabel": { "message": "データベース" },
+  "notionDatabasePickerTitle": { "message": "データベースを選択" },
+  "notionDatabaseSearchLabel": { "message": "アクセス可能な Notion データベースを検索" },
+  "notionDatabaseSearchPlaceholder": { "message": "データベース名を検索…" },
+  "notionDatabaseSearchButton": { "message": "検索" },
+  "notionDatabaseSearchEmpty": { "message": "アクセス可能なデータベースが見つかりません。" },
+  "notionDatabaseSearchMore": { "message": "さらに結果があります。名前を絞り込んで再検索してください。" },
+  "notionDatabaseUntitled": { "message": "無題のデータベース" },
+  "notionDatabaseSelected": { "message": "選択中のデータベース" },
+  "notionPermissionDenied": { "message": "Notion へのアクセスが許可されていません。" },
+  "notionSchemaCheck": { "message": "列を確認" },
+  "notionSchemaChecking": { "message": "データベースの列を確認中…" },
+  "notionSchemaConfiguring": { "message": "データベースの列を設定中…" },
+  "notionSchemaCompatible": { "message": "データベースの列は要件を満たしています。" },
+  "notionSchemaConfigured": { "message": "必要な列を設定しました。" },
+  "notionTechnicalFieldsTitle": { "message": "Notion で技術用の列を非表示にする" },
+  "notionTechnicalFieldsBody": { "message": "Notion API では view の列表示を変更できません。データベースを開き、読者に技術情報を見せたくない各 view で次の列を非表示にしてください。" },
+  "notionOpenDatabase": { "message": "Notion で開く" },
+  "notionSchemaIncompatible": { "message": "データベースの列が要件と一致しません。" },
+  "notionSchemaMissing": {
+    "message": "$property$（$type$）がありません",
+    "placeholders": {
+      "property": { "content": "$1" },
+      "type": { "content": "$2" }
+    }
+  },
+  "notionSchemaTitleRename": {
+    "message": "タイトル列「$current$」を「$property$」に変更",
+    "placeholders": {
+      "current": { "content": "$1" },
+      "property": { "content": "$2" }
+    }
+  },
+  "notionSchemaWrongType": {
+    "message": "$property$：$current$ から $expected$ に変更",
+    "placeholders": {
+      "property": { "content": "$1" },
+      "current": { "content": "$2" },
+      "expected": { "content": "$3" }
+    }
+  },
+  "notionSchemaConfigureButton": { "message": "必要な列を設定" },
+  "notionConfigureDangerTitle": { "message": "データベースの内容が永久に失われる可能性があります" },
+  "notionConfigureDangerBody": { "message": "拡張機能は必要な schema を設定するため、列名や型を変更したり、同名の列を削除したりする場合があります。既存の値が読めなくなるか永久に削除され、Notion では元に戻せません。先にデータベースをバックアップしてください。" },
+  "notionConfigureConfirm": { "message": "それでも列を設定" },
+  "notionConfigureConfirmationRequired": { "message": "データ損失の警告を確認してから Notion の列を設定してください。" },
+  "notionPropertyTypeTitle": { "message": "タイトル" },
+  "notionPropertyTypeRichText": { "message": "テキスト" },
+  "notionPropertyTypeNumber": { "message": "数値" },
+  "notionPropertyTypeSelect": { "message": "セレクト" },
+  "notionPropertyTypeDate": { "message": "日付" },
   "notionPatHelp": {
     "message": "対象の database をこのインテグレーションに共有してください。マーカーが増えると Notion は目に見えて遅くなります。"
   },

@@ -18,7 +18,7 @@ const REQUIRED_COLUMNS =
 export const notionFields: readonly ConfigField[] = [
   {
     key: "pat",
-    label: "Integration Token (PAT)",
+    label: t("notionPatLabel"),
     kind: "secret",
     required: true,
     placeholder: "ntn_…",
@@ -26,7 +26,7 @@ export const notionFields: readonly ConfigField[] = [
   },
   {
     key: "databaseId",
-    label: "Database ID",
+    label: t("notionDatabaseFieldLabel"),
     kind: "text",
     required: true,
     placeholder: t("notionDatabaseIdPlaceholder"),

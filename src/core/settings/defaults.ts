@@ -18,30 +18,35 @@ import type {
   PromptPreset
 } from "./types"
 
-export const DEFAULT_SETTINGS: AppSettings = {
-  storage: { active: "idb", configs: [] },
-  llm: { active: "openrouter", configs: [] },
-  prompts: [
-    {
-      id: "translate",
-      label: t("promptPresetTranslateLabel"),
-      template: t("promptPresetTranslateTemplate"),
-      order: 0
-    },
-    {
-      id: "grammar",
-      label: t("promptPresetGrammarLabel"),
-      template: t("promptPresetGrammarTemplate"),
-      order: 1
-    },
-    {
-      id: "reading",
-      label: t("promptPresetReadingLabel"),
-      template: t("promptPresetReadingTemplate"),
-      order: 2
-    }
-  ]
+export function createDefaultSettings(): AppSettings {
+  return {
+    storage: { active: "idb", configs: [] },
+    llm: { active: "openrouter", configs: [] },
+    responseLanguage: t("assistantResponseLanguage"),
+    prompts: [
+      {
+        id: "translate",
+        label: t("promptPresetTranslateLabel"),
+        template: t("promptPresetTranslateTemplate"),
+        order: 0
+      },
+      {
+        id: "grammar",
+        label: t("promptPresetGrammarLabel"),
+        template: t("promptPresetGrammarTemplate"),
+        order: 1
+      },
+      {
+        id: "reading",
+        label: t("promptPresetReadingLabel"),
+        template: t("promptPresetReadingTemplate"),
+        order: 2
+      }
+    ]
+  }
 }
+
+export const DEFAULT_SETTINGS: AppSettings = createDefaultSettings()
 
 /**
  * Recovers element by element: one unreadable entry must not cost the user every
@@ -87,9 +92,15 @@ const promptSchema: z.ZodType<PromptPreset> = z.object({
   order: z.number()
 })
 
+const responseLanguageSchema = z
+  .string()
+  .transform((value) => value.trim() || DEFAULT_SETTINGS.responseLanguage)
+  .catch(DEFAULT_SETTINGS.responseLanguage)
+
 const settingsSchema = z.object({
   storage: providerSelection(DEFAULT_SETTINGS.storage),
   llm: providerSelection(DEFAULT_SETTINGS.llm),
+  responseLanguage: responseLanguageSchema,
   prompts: lenientArray(promptSchema, DEFAULT_SETTINGS.prompts)
 })
 

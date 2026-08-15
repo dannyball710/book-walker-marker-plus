@@ -1,7 +1,7 @@
 {
-  "extensionName": { "message": "BOOK☆WALKER Marker" },
+  "extensionName": { "message": "Book Walker Marker Plus" },
   "extensionDescription": {
-    "message": "用擴充套件自己的標註、備註與 LLM 對話，取代 BOOK☆WALKER 閱讀器內建的標註。"
+    "message": "用擴充套件自己的標註、備註與 LLM 對話，取代 Book Walker 閱讀器內建的標註。"
   },
 
   "commonListSeparator": { "message": "、" },
@@ -12,7 +12,11 @@
   "commonSettings": { "message": "設定" },
   "commonLoading": { "message": "讀取中…" },
 
-  "optionsTitle": { "message": "BOOK☆WALKER Marker 設定" },
+  "optionsEyebrow": { "message": "閱讀工作區" },
+  "optionsTitle": { "message": "Book Walker Marker Plus 設定" },
+  "optionsSubtitle": {
+    "message": "設定標註存放位置、連接 AI 模型，並整理陪你閱讀的快捷提問。"
+  },
   "optionsLoading": { "message": "讀取設定中…" },
   "optionsLoadFailed": {
     "message": "讀取設定失敗：$reason$",
@@ -24,9 +28,13 @@
   "optionsReload": { "message": "重新載入" },
   "optionsStorageLegend": { "message": "儲存位置" },
   "optionsStorageNote": {
-    "message": "標註只存在選定的那一邊，兩邊不同步，切換也不會搬移。本擴充套件不會寫回 BOOK☆WALKER 帳號。"
+    "message": "標註只存在選定的那一邊，兩邊不同步，切換也不會搬移。本擴充套件不會寫回 Book Walker 帳號。"
   },
   "optionsLlmLegend": { "message": "LLM" },
+  "optionsLlmNote": {
+    "message": "連接用來回答段落問題的模型。切換服務商不會影響已儲存的標註。"
+  },
+  "optionsPermissionTitle": { "message": "網路存取權" },
   "optionsSecretsLocalNote": {
     "message": "金鑰只留在這台電腦，不會同步到其他裝置。"
   },
@@ -39,12 +47,19 @@
     "placeholders": { "origins": { "content": "$1" } }
   },
   "optionsSaveButton": { "message": "儲存設定" },
+  "optionsSaveHint": { "message": "變更會在儲存後套用。" },
+  "optionsSaving": { "message": "儲存中…" },
   "optionsSaved": { "message": "已儲存，立即生效。" },
   "optionsSavedLlmIncomplete": { "message": "已儲存。LLM 設定尚未完成。" },
   "optionsNotSavedFields": { "message": "尚未儲存（見上方欄位問題）" },
   "optionsNotSavedPermission": { "message": "尚未儲存（權限被拒絕）" },
 
   "providersEmpty": { "message": "沒有可用的服務商。" },
+  "providerSelected": { "message": "使用中" },
+  "providerConfigure": {
+    "message": "設定 $label$",
+    "placeholders": { "label": { "content": "$1" } }
+  },
   "providerLoadModels": { "message": "載入模型清單" },
   "providerModelsLoaded": {
     "message": "已載入 $count$ 個模型。",
@@ -71,17 +86,20 @@
     "placeholders": { "id": { "content": "$1" } }
   },
 
+  "fieldRequired": { "message": "必填" },
   "fieldSelectNone": { "message": "（未選擇）" },
   "fieldSecretHide": { "message": "隱藏" },
   "fieldSecretShow": { "message": "顯示" },
 
   "promptsLegend": { "message": "常用提示詞" },
+  "promptsPlaceholdersLabel": { "message": "可用佔位符" },
   "promptsIntro": {
     "message": "這些按鈕會出現在側邊欄的對話區上方。可用佔位符："
   },
   "promptsVarText": { "message": "（標註原文）" },
   "promptsVarMemo": { "message": "（備註）" },
   "promptsVarBookTitle": { "message": "（書名）" },
+  "promptsVarResponseLanguage": { "message": "（回應語言設定）" },
   "promptsEmpty": { "message": "目前沒有任何提示詞。" },
   "promptLabelField": { "message": "按鈕文字" },
   "promptTemplateField": { "message": "提示詞內容" },
@@ -89,50 +107,93 @@
   "promptMoveDown": { "message": "下移" },
   "promptAdd": { "message": "新增提示詞" },
   "promptNewLabel": { "message": "新的提示詞" },
+  "assistantResponseLanguageLabel": { "message": "回應語言" },
+  "assistantResponseLanguageHelp": {
+    "message": "套用於閱讀助手及 {{responseLanguage}} 提示詞佔位符；留空時使用瀏覽器語言。"
+  },
+  "assistantResponseLanguage": { "message": "繁體中文（台灣）" },
 
   "promptPresetTranslateLabel": { "message": "翻譯這段" },
   "promptPresetTranslateTemplate": {
-    "message": "請把《{{bookTitle}}》的這段日文翻成繁體中文，並保留原文的語氣：\n\n{{text}}"
+    "message": "請把《{{bookTitle}}》的這段日文翻成 {{responseLanguage}}，並保留原文的語氣：\n\n{{text}}"
   },
   "promptPresetGrammarLabel": { "message": "解釋文法" },
   "promptPresetGrammarTemplate": {
-    "message": "請解釋這段日文的文法結構，逐句拆解助詞與動詞變化：\n\n{{text}}"
+    "message": "請使用 {{responseLanguage}} 解釋這段日文的文法結構，逐句拆解助詞與動詞變化：\n\n{{text}}"
   },
   "promptPresetReadingLabel": { "message": "漢字讀音" },
   "promptPresetReadingTemplate": {
-    "message": "請標出這段日文中每個漢字的讀音（以 {漢字|かんじ} 格式輸出）：\n\n{{text}}"
+    "message": "請使用 {{responseLanguage}} 回答，並標出這段日文中每個漢字的讀音（以 {漢字|かんじ} 格式輸出）：\n\n{{text}}"
   },
 
+  "panelNoBook": { "message": "開啟 Book Walker 書籍後即可開始" },
+  "panelToolsLabel": { "message": "閱讀工具" },
+  "panelWorkspaceTab": { "message": "目前段落" },
+
   "markerSectionTitle": { "message": "標註" },
+  "markerLibraryTab": { "message": "本書標註" },
+  "markerSearchLabel": { "message": "搜尋本書標註" },
+  "markerSearchPlaceholder": { "message": "搜尋原文或備註…" },
+  "markerSearchEmpty": { "message": "找不到符合的標註。" },
+  "markerLibraryEmpty": { "message": "本書尚無標註。" },
+  "markerEmptyTitle": { "message": "側註區準備好了" },
   "markerEmptyHint": {
     "message": "在閱讀器選取文字，或點擊既有的標註。"
   },
   "markerCreate": { "message": "建立標註" },
+  "markerCreating": { "message": "建立中…" },
+  "markerCreated": { "message": "已建立" },
+  "markerSaving": { "message": "儲存中…" },
+  "markerSaved": { "message": "已儲存" },
+  "markerEditTitle": { "message": "編輯標註" },
+  "markerComposeEyebrow": { "message": "留在書頁旁" },
+  "markerComposeHint": {
+    "message": "可先把 AI 回答加入備註，再整理成你想留下的側註。"
+  },
   "markerListHeading": {
     "message": "本書標註（$count$）",
     "placeholders": { "count": { "content": "$1" } }
   },
+  "markerExcerptLabel": { "message": "選取段落" },
+  "markerMemoLabel": { "message": "備註" },
   "markerMemoHint": {
     "message": "備註可用 {漢字|かんじ} 寫讀音，離開編輯框後顯示為 ruby。"
   },
   "markerMemoPlaceholder": { "message": "輸入備註…" },
   "markerDiscard": { "message": "捨棄" },
+  "markerDeletePrompt": { "message": "要刪除這則標註嗎？此操作無法復原。" },
   "markerDeleteConfirm": { "message": "確認刪除" },
   "markerColorGroupLabel": { "message": "標註顏色" },
+  "markerColorPink": { "message": "粉紅" },
+  "markerColorYellow": { "message": "黃色" },
+  "markerColorGreen": { "message": "綠色" },
+  "markerColorBlue": { "message": "藍色" },
+  "markerLibraryEyebrow": { "message": "這本書" },
   "markerNotFound": { "message": "找不到這個標註，可能已刪除。" },
   "markerDeletedNeedsReload": {
     "message": "標註已刪除，畫面上的線需重新載入閱讀器才會消失。"
   },
 
+  "chatContextEyebrow": { "message": "段落助理" },
   "chatSectionTitle": { "message": "對話" },
+  "chatPrivateLabel": { "message": "僅限本次" },
+  "chatEmptyTitle": { "message": "先選一段內容" },
   "chatPickMarker": { "message": "選一個標註就能針對它提問。" },
+  "chatQuickPrompts": { "message": "快速提問" },
+  "chatReadyHint": { "message": "選擇快捷提問，或直接問這段內容。" },
   "chatNotStored": { "message": "對話不會儲存，關閉面板或換一段就消失。" },
   "chatRoleUser": { "message": "你" },
   "chatRoleAssistant": { "message": "助理" },
+  "chatMessageExpand": { "message": "展開訊息" },
+  "chatMessageCollapse": { "message": "收合訊息" },
   "chatGenerating": { "message": "產生中…" },
   "chatInputPlaceholder": { "message": "對這段內容提問…" },
+  "chatKeyboardHint": { "message": "Ctrl / ⌘ + Enter 送出" },
   "chatSend": { "message": "送出" },
   "chatAbort": { "message": "中止" },
+  "chatClear": { "message": "清空對話" },
+  "chatAddToNote": { "message": "加入備註" },
+  "chatAddedToNote": { "message": "已加入備註" },
   "chatPortDisconnected": {
     "message": "連線中斷，回覆已中止。請重新送出。"
   },
@@ -228,12 +289,64 @@
   },
 
   "storageIdbLabel": { "message": "本機（IndexedDB）" },
+  "notionPatLabel": { "message": "整合權杖（Integration Token）" },
+  "notionDatabaseFieldLabel": { "message": "資料庫" },
+  "notionDatabasePickerTitle": { "message": "選擇資料庫" },
+  "notionDatabaseSearchLabel": { "message": "搜尋可存取的 Notion 資料庫" },
+  "notionDatabaseSearchPlaceholder": { "message": "搜尋資料庫名稱…" },
+  "notionDatabaseSearchButton": { "message": "搜尋" },
+  "notionDatabaseSearchEmpty": { "message": "找不到可存取且符合的資料庫。" },
+  "notionDatabaseSearchMore": { "message": "還有更多結果，請縮小名稱範圍後重新搜尋。" },
+  "notionDatabaseUntitled": { "message": "未命名資料庫" },
+  "notionDatabaseSelected": { "message": "已選擇的資料庫" },
+  "notionPermissionDenied": { "message": "尚未取得 Notion 存取權限。" },
+  "notionSchemaCheck": { "message": "檢查欄位" },
+  "notionSchemaChecking": { "message": "正在檢查資料庫欄位…" },
+  "notionSchemaConfiguring": { "message": "正在設定資料庫欄位…" },
+  "notionSchemaCompatible": { "message": "資料庫欄位符合需求。" },
+  "notionSchemaConfigured": { "message": "必要欄位已設定完成。" },
+  "notionTechnicalFieldsTitle": { "message": "在 Notion 隱藏技術欄位" },
+  "notionTechnicalFieldsBody": { "message": "Notion API 無法變更 view 的欄位顯示狀態。請開啟資料庫，在不希望讀者看到技術資料的每個 view 中隱藏以下欄位。" },
+  "notionOpenDatabase": { "message": "在 Notion 開啟" },
+  "notionSchemaIncompatible": { "message": "資料庫欄位不符合需求。" },
+  "notionSchemaMissing": {
+    "message": "缺少 $property$（$type$）",
+    "placeholders": {
+      "property": { "content": "$1" },
+      "type": { "content": "$2" }
+    }
+  },
+  "notionSchemaTitleRename": {
+    "message": "將 title 欄位「$current$」改名為「$property$」",
+    "placeholders": {
+      "current": { "content": "$1" },
+      "property": { "content": "$2" }
+    }
+  },
+  "notionSchemaWrongType": {
+    "message": "$property$：由 $current$ 改為 $expected$",
+    "placeholders": {
+      "property": { "content": "$1" },
+      "current": { "content": "$2" },
+      "expected": { "content": "$3" }
+    }
+  },
+  "notionSchemaConfigureButton": { "message": "設定必要欄位" },
+  "notionConfigureDangerTitle": { "message": "此操作可能永久破壞資料庫內容" },
+  "notionConfigureDangerBody": { "message": "擴充套件可能重新命名欄位、變更欄位型別，或先刪除同名欄位再建立必要結構。既有值可能變得無法讀取或被永久刪除，Notion 不提供此操作的復原功能。請先備份資料庫。" },
+  "notionConfigureConfirm": { "message": "仍要設定欄位" },
+  "notionConfigureConfirmationRequired": { "message": "請先確認資料損失警告，再設定 Notion 欄位。" },
+  "notionPropertyTypeTitle": { "message": "標題" },
+  "notionPropertyTypeRichText": { "message": "文字" },
+  "notionPropertyTypeNumber": { "message": "數字" },
+  "notionPropertyTypeSelect": { "message": "選項" },
+  "notionPropertyTypeDate": { "message": "日期" },
   "notionPatHelp": {
-    "message": "把目標 database 分享給這個整合。標註一多，Notion 的讀寫會明顯變慢。"
+    "message": "把目標資料庫分享給這個整合。標註一多，Notion 的讀寫會明顯變慢。"
   },
   "notionDatabaseIdPlaceholder": { "message": "32 碼十六進位字串" },
   "notionDatabaseIdHelp": {
-    "message": "Database 需要這 17 個欄位：$columns$",
+    "message": "資料庫需要這 17 個欄位：$columns$",
     "placeholders": { "columns": { "content": "$1" } }
   }
 }

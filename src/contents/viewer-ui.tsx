@@ -41,6 +41,7 @@ import {
 } from "~/viewer/highlight-index"
 import { opaqueFillFor } from "~/viewer/marker-color"
 import { readCidFromLocation, readViewerFontSize } from "~/viewer/page-state"
+import { tooltipText } from "~/viewer/tooltip-text"
 
 // Mirrors viewer-bridge.ts: `*` covers the version segment, so no version is hard-coded.
 export const config: PlasmoCSConfig = {
@@ -50,9 +51,9 @@ export const config: PlasmoCSConfig = {
 
 const HOVER_THROTTLE_MS = 30
 const MARKER_REFRESH_INTERVAL_MS = 2000
-const TOOLTIP_MAX_WIDTH = 320
-const TOOLTIP_OFFSET = 14
-const TOOLTIP_ASSUMED_HEIGHT = 160
+const TOOLTIP_MAX_WIDTH = 260
+const TOOLTIP_OFFSET = 10
+const TOOLTIP_ASSUMED_HEIGHT = 128
 
 /** jQuery UI measures its dialogs, so they must keep their size. */
 const HIDE_NATIVE_UI_CSS = `
@@ -406,7 +407,7 @@ function showTooltipAt(x: number, y: number): void {
     publishTooltip(null)
     return
   }
-  publishTooltip({ markerId: marker.id, memo: marker.memo, x, y })
+  publishTooltip({ markerId: marker.id, memo: tooltipText(marker.memo), x, y })
 }
 
 function claim(event: MouseEvent): void {
@@ -442,11 +443,13 @@ function onClick(event: Event): void {
   const markerId = pressedMarkerId
   pressedMarkerId = null
   if (markerId === null) return
+  const marker = markers.find((candidate) => candidate.id === markerId)
+  if (marker === undefined) return
   claim(event)
   // chrome.sidePanel.open() needs the user gesture's call stack: never await first.
   sendToBackground<PanelFocusRequest, BgResult<unknown>>({
     name: BG_MESSAGE.panelFocus,
-    body: { markerId }
+    body: { marker }
   })
     .then(unwrap)
     .catch((error: unknown) => warn("could not focus the side panel", error))
@@ -486,6 +489,57 @@ function attachHover(renderer: Element): void {
   scheduleReconcile()
 }
 
+/** Apply the completed write directly instead of waiting for a remote store query to
+ * become consistent. The normal refresh path will replace this optimistic snapshot later. */
+function upsertHighlight(
+  bookId: string,
+  upsertProfile: FontProfile,
+  item: RawMarkerItem
+): void {
+  const currentBookId = bookContext?.cid ?? readCidFromLocation()
+  if (bookId !== currentBookId) return
+
+  const existing = markers.find((candidate) => candidate.id === item.id)
+  const browser = item.appendix.browser
+  const position = browser.position[upsertProfile]
+  const profileLocator = {
+    sFile: browser.sFile,
+    sidx: browser.sidx,
+    eFile: browser.eFile,
+    eidx: browser.eidx,
+    ...(position === undefined ? {} : { position })
+  }
+  const byProfile: BwMarker["locator"]["byProfile"] = {
+    ...(existing?.locator.byProfile ?? {}),
+    [upsertProfile]: profileLocator
+  }
+  const now = Date.now()
+  const parsedDate = Date.parse(item.date)
+  const timestamp = Number.isNaN(parsedDate) ? now : parsedDate
+  const marker: BwMarker = {
+    id: item.id,
+    bookId,
+    bookTitle: existing?.bookTitle ?? bookContext?.bookTitle ?? "",
+    text: item.text,
+    memo: item.memo,
+    color: item.color,
+    locator: {
+      epubcfi: item.epubcfi,
+      capturedProfile: existing?.locator.capturedProfile ?? upsertProfile,
+      byProfile
+    },
+    progress: item.pr,
+    createdAt: existing?.createdAt ?? timestamp,
+    updatedAt: now
+  }
+
+  markers = [...markers.filter((candidate) => candidate.id !== marker.id), marker]
+  for (let index = browser.sidx; index <= browser.eidx; index += 1) {
+    deleted.delete(index)
+  }
+  reconcileHighlights()
+}
+
 /**
  * The viewer keeps its own marker list in memory and redraws from it, so a deleted
  * marker comes back on the next page turn unless every redraw is told to drop it.
@@ -512,6 +566,9 @@ function handleContentCommand(command: ContentCommand): void {
       // An explicit request must not be swallowed by the focus-refresh throttle.
       lastRefreshAt = 0
       refreshMarkers()
+      return
+    case "content/upsert-highlight":
+      upsertHighlight(command.bookId, command.profile, command.marker)
       return
     case "content/remove-highlight":
       removeHighlight(command.markerId)
@@ -581,52 +638,93 @@ waitForElement("#renderer", attachHover)
 export const getStyle: PlasmoGetStyle = () => {
   const style = document.createElement("style")
   style.textContent = `
+:host(plasmo-csui) {
+  color-scheme: light dark;
+  --bwm-surface: 255 255 255;
+  --bwm-line: 223 224 218;
+  --bwm-ink: 32 32 25;
+  --bwm-ink-soft: 70 69 61;
+  --bwm-danger: 181 65 82;
+  --bwm-danger-soft: 255 240 242;
+}
+@media (prefers-color-scheme: dark) {
+  :host(plasmo-csui) {
+    --bwm-surface: 33 31 28;
+    --bwm-line: 55 52 47;
+    --bwm-ink: 242 240 234;
+    --bwm-ink-soft: 213 209 200;
+    --bwm-danger: 255 136 152;
+    --bwm-danger-soft: 59 34 41;
+  }
+}
 .bwm-tooltip {
   position: fixed;
   z-index: 2147483647;
+  box-sizing: border-box;
+  overflow: hidden;
   pointer-events: none;
   padding: 8px 10px;
-  border-radius: 6px;
-  background: rgba(28, 28, 30, 0.96);
-  color: #fff;
-  font-size: 13px;
-  line-height: 1.7;
-  white-space: pre-wrap;
+  border: 1px solid rgb(var(--bwm-line));
+  border-radius: 8px;
+  background: rgb(var(--bwm-surface) / 0.95);
+  color: rgb(var(--bwm-ink));
+  font-family: Aptos, "Noto Sans TC", "Hiragino Sans", "Yu Gothic UI", "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 24px;
+  box-shadow: 0 1px 2px rgba(23, 25, 38, 0.04), 0 6px 18px rgba(23, 25, 38, 0.05);
+  backdrop-filter: blur(12px);
+}
+.bwm-tooltip-text {
   overflow-wrap: anywhere;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  white-space: pre-wrap;
 }
 .bwm-tooltip rt {
-  font-size: 0.6em;
-  opacity: 0.85;
+  color: rgb(var(--bwm-ink-soft));
+  font-size: 0.58em;
+  font-weight: 600;
 }
 .bwm-alert {
   position: fixed;
-  z-index: 2147483647;
   top: 16px;
   left: 50%;
-  transform: translateX(-50%);
+  z-index: 2147483647;
   display: flex;
-  gap: 12px;
+  box-sizing: border-box;
+  width: min(480px, calc(100vw - 32px));
   align-items: flex-start;
-  max-width: 480px;
+  gap: 12px;
   padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(158, 27, 62, 0.97);
-  color: #fff;
-  font-size: 13px;
-  line-height: 1.6;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transform: translateX(-50%);
+  border: 1px solid rgb(var(--bwm-danger) / 0.3);
+  border-radius: 12px;
+  background: rgb(var(--bwm-danger-soft));
+  color: rgb(var(--bwm-danger));
+  font-family: Aptos, "Noto Sans TC", "Hiragino Sans", "Yu Gothic UI", "Segoe UI", system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 24px;
+  box-shadow: 0 18px 48px rgba(29, 28, 54, 0.1);
 }
-.bwm-alert button {
+.bwm-alert-message {
+  flex: 1;
+}
+.bwm-alert-close {
   flex: none;
-  border: 0;
-  border-radius: 4px;
-  padding: 2px 8px;
-  background: rgba(255, 255, 255, 0.18);
-  color: inherit;
+  padding: 4px 8px;
+  border: 1px solid rgb(var(--bwm-danger) / 0.2);
+  border-radius: 8px;
+  background: transparent;
+  color: rgb(var(--bwm-danger));
   font: inherit;
+  font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
+}
+.bwm-alert-close:hover {
+  background: rgb(var(--bwm-danger) / 0.1);
+}
+.bwm-alert-close:focus-visible {
+  outline: 3px solid rgb(var(--bwm-danger) / 0.3);
+  outline-offset: 1px;
 }`
   return style
 }
@@ -644,7 +742,9 @@ function Tooltip(props: { readonly state: TooltipState }): JSX.Element {
         transform: `translate(${flipX ? "-100%" : "0"}, ${flipY ? "-100%" : "0"})`,
         maxWidth: TOOLTIP_MAX_WIDTH
       }}>
-      <RubyText text={state.memo} />
+      <div className="bwm-tooltip-text">
+        <RubyText text={state.memo} />
+      </div>
     </div>
   )
 }
@@ -656,8 +756,11 @@ export default function ViewerUi(): JSX.Element {
       {state.tooltip !== null && <Tooltip state={state.tooltip} />}
       {state.alert !== null && (
         <div className="bwm-alert" role="alert">
-          <span>{state.alert}</span>
-          <button type="button" onClick={() => publishAlert(null)}>
+          <span className="bwm-alert-message">{state.alert}</span>
+          <button
+            type="button"
+            className="bwm-alert-close"
+            onClick={() => publishAlert(null)}>
             {t("commonClose")}
           </button>
         </div>

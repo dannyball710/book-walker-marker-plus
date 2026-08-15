@@ -27,7 +27,7 @@ const NATIVE_MARKER = {
     // a client we know nothing about
     ios: { page: 42 }
   },
-  // a top-level field BOOK☆WALKER may add later
+  // a top-level field Book Walker may add later
   deviceName: "iPhone"
 }
 
@@ -125,7 +125,7 @@ describe("mergeGetMarkerResponse", () => {
   })
 
   it("still injects when a native marker does not match our schema at all", () => {
-    // A marker made in the BOOK☆WALKER app: no appendix.browser, so validating it
+    // A marker made in the Book Walker app: no appendix.browser, so validating it
     // would abandon the injection and leave the book with no extension highlights.
     const foreign = { id: "app-1", epubcfi: "epubcfi(/6/24!/4/2/8)", appendix: {} }
     const merged = mergeGetMarkerResponse(responseText([foreign]), [OUR_MARKER])

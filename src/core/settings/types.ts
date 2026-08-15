@@ -25,6 +25,7 @@ export interface PromptPreset {
 export interface AppSettings {
   readonly storage: ProviderSelection
   readonly llm: ProviderSelection
+  readonly responseLanguage: string
   readonly prompts: readonly PromptPreset[]
 }
 

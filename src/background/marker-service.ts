@@ -29,7 +29,8 @@ const selectionSchema = z.object({
   sfs: fontSizeSchema,
   sff: fontFaceSchema,
   cfi: z.string(),
-  text: z.string()
+  text: z.string(),
+  contextText: z.string().optional()
 })
 
 const bookContextSchema = z.object({
@@ -74,7 +75,7 @@ export async function deleteMarker(id: string): Promise<void> {
 
 /**
  * The only creation path: the extension builds the marker from the captured selection,
- * so nothing is written to BOOK☆WALKER and no viewer round-trip has to be waited for.
+ * so nothing is written to Book Walker and no viewer round-trip has to be waited for.
  * The selection's own font profile is the captured one — it is what /cri measured the
  * region indexes in. A `position` hint only exists for markers the viewer's engine
  * produced, so this locator has none.
@@ -105,6 +106,9 @@ export async function createFromSelection(input: {
     bookId: selection.cid,
     bookTitle: ctx.bookTitle,
     text: selection.text,
+    ...(selection.contextText === undefined
+      ? {}
+      : { contextText: selection.contextText }),
     memo: input.memo,
     color: input.color,
     locator: { epubcfi: selection.cfi, capturedProfile: profile, byProfile },
@@ -138,11 +142,25 @@ export async function getPendingSelection(): Promise<SelectionCaptured | null> {
   const parsed = selectionSchema.safeParse(
     await readSession(PENDING_SELECTION_KEY)
   )
-  return parsed.success ? parsed.data : null
+  if (!parsed.success) return null
+  const selection = parsed.data
+  return {
+    cid: selection.cid,
+    file: selection.file,
+    sidx: selection.sidx,
+    eidx: selection.eidx,
+    sfs: selection.sfs,
+    sff: selection.sff,
+    cfi: selection.cfi,
+    text: selection.text,
+    ...(selection.contextText === undefined
+      ? {}
+      : { contextText: selection.contextText })
+  }
 }
 
-export async function setPendingFocus(markerId: string): Promise<void> {
-  await chrome.storage.session.set({ [PENDING_FOCUS_KEY]: markerId })
+export async function setPendingFocus(marker: BwMarker): Promise<void> {
+  await chrome.storage.session.set({ [PENDING_FOCUS_KEY]: marker })
 }
 
 export async function setBookContext(ctx: BookContext): Promise<void> {

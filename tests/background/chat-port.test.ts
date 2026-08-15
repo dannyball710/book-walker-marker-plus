@@ -114,6 +114,22 @@ describe("createChatPortSession — one stream per port", () => {
     expect(post).not.toHaveBeenCalled()
   })
 
+  it("aborts an in-flight reply when the conversation is cleared", async () => {
+    const post = vi.fn()
+    const { session, runs } = setup(post)
+
+    session.onMessage(start)
+    session.onMessage({ type: "clear" })
+    post.mockClear()
+
+    expect(runs[0]?.input.signal.aborted).toBe(true)
+    runs[0]?.input.handlers.onDelta("stale")
+    runs[0]?.resolve(reply("late answer"))
+    await flush()
+
+    expect(post).not.toHaveBeenCalled()
+  })
+
   it("reports nothing at all once the port is gone", async () => {
     const post = vi.fn()
     const { session, runs } = setup(post)
@@ -188,6 +204,22 @@ describe("createChatPortSession — the conversation", () => {
     expect(runs[1]?.input.history).toEqual([first.user, first.assistant])
   })
 
+  it("keeps draft history when that passage becomes a saved marker", async () => {
+    const { session, runs } = setup()
+    const first = reply("答え")
+
+    session.onMessage(draftStart)
+    runs[0]?.resolve(first)
+    await flush()
+
+    session.onMessage({
+      ...start,
+      subject: { kind: "marker", markerId: "m1", key: "cfi-1" }
+    })
+
+    expect(runs[1]?.input.history).toEqual([first.user, first.assistant])
+  })
+
   it("carries a marker conversation the same way, with nothing loaded from storage", async () => {
     const { session, runs } = setup()
     const first = reply("答え")
@@ -200,6 +232,20 @@ describe("createChatPortSession — the conversation", () => {
     session.onMessage({ ...start, prompt: "ほかには？" })
 
     expect(runs[1]?.input.history).toEqual([first.user, first.assistant])
+  })
+
+  it("starts a fresh history after the conversation is cleared", async () => {
+    const { session, runs } = setup()
+    const first = reply("答え")
+
+    session.onMessage(start)
+    runs[0]?.resolve(first)
+    await flush()
+
+    session.onMessage({ type: "clear" })
+    session.onMessage({ ...start, prompt: "新しい質問" })
+
+    expect(runs[1]?.input.history).toEqual([])
   })
 
   it("starts over when the reader selects another passage", async () => {

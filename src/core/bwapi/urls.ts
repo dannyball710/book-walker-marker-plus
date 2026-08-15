@@ -1,5 +1,5 @@
 /**
- * URL classification and query building for the BOOK☆WALKER browserWebApi.
+ * URL classification and query building for the Book Walker browserWebApi.
  * The viewer path carries a version segment (`/03/30/`), so classification
  * looks only at the segment right after `/browserWebApi/`.
  */

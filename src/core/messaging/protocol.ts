@@ -6,11 +6,13 @@ import type { ChatMessage, ChatSubject } from "~/core/chat/types"
 import type {
   ConfigField,
   ConfigIssue,
-  ConfigValues
+  ConfigValues,
+  ProviderOptionsTool
 } from "~/core/provider/descriptor"
 import type {
   BookContext,
   BwMarker,
+  FontProfile,
   MarkerColor,
   MarkerQuery,
   RawMarkerItem,
@@ -78,6 +80,9 @@ export const BG_MESSAGE = {
   providerCatalog: "provider-catalog",
   providerHosts: "provider-hosts",
   llmModels: "llm-models",
+  notionDatabases: "notion-databases",
+  notionDatabaseSchema: "notion-database-schema",
+  notionDatabaseConfigure: "notion-database-configure",
   panelFocus: "panel-focus"
 } as const
 
@@ -142,6 +147,7 @@ export interface ProviderCatalogEntry {
   readonly label: string
   readonly fields: readonly ConfigField[]
   readonly docsUrl?: string
+  readonly optionsTool?: ProviderOptionsTool
   /** llm only: the field whose value is the model id */
   readonly modelField?: string
   /**
@@ -193,7 +199,7 @@ export interface SettingsSetResponse {
 /** Sent from background to the side panel when a highlight is clicked. */
 export interface PanelFocusMessage {
   readonly type: "panel/focus-marker"
-  readonly markerId: string
+  readonly marker: BwMarker
 }
 
 /** Pushed when /cri produced a new selection, so the panel does not have to poll. */
@@ -209,6 +215,12 @@ export interface PanelSelectionMessage {
  */
 export type ContentCommand =
   | { readonly type: "content/refresh-markers" }
+  | {
+      readonly type: "content/upsert-highlight"
+      readonly bookId: string
+      readonly profile: FontProfile
+      readonly marker: RawMarkerItem
+    }
   | { readonly type: "content/remove-highlight"; readonly markerId: string }
 
 /** Long-lived port used for chat streaming. */
@@ -221,6 +233,7 @@ export type ChatPortRequest =
       readonly prompt: string
     }
   | { readonly type: "abort" }
+  | { readonly type: "clear" }
 
 export type ChatPortResponse =
   | { readonly type: "delta"; readonly delta: string }

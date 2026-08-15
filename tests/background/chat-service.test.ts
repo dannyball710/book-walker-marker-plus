@@ -13,6 +13,7 @@ interface Harness {
   /** whether the key was present in the streamText call at all, not just its value */
   providerOptionsSent: boolean
   providerOptions: unknown
+  responseLanguage: string
   fail: Error | null
 }
 
@@ -22,6 +23,7 @@ const h = vi.hoisted<Harness>(() => ({
   sent: [],
   providerOptionsSent: false,
   providerOptions: undefined,
+  responseLanguage: "English",
   fail: null
 }))
 
@@ -88,7 +90,13 @@ vi.mock("~/background/marker-service", () => ({
 }))
 
 vi.mock("~/storage/settings", () => ({
-  getSettings: () => Promise.resolve({ storage: {}, llm: {}, prompts: [] })
+  getSettings: () =>
+    Promise.resolve({
+      storage: {},
+      llm: {},
+      responseLanguage: h.responseLanguage,
+      prompts: []
+    })
 }))
 
 vi.mock("~/llm", () => ({
@@ -130,6 +138,7 @@ beforeEach(() => {
   h.chunks = ["本文", "（ほんぶん）"]
   h.providerOptionsSent = false
   h.providerOptions = undefined
+  h.responseLanguage = "English"
   h.fail = null
 })
 
@@ -140,6 +149,30 @@ describe("runChatStream", () => {
     expect(user.content).toBe(`この一文を訳して：${MARKER.text}`)
     expect(user.content).not.toContain("{{text}}")
     expect(h.sent[0]?.content).toBe(user.content)
+  })
+
+  it("uses the response language setting in the system and preset prompts", async () => {
+    h.responseLanguage = "Brazilian Portuguese"
+
+    const { user } = await run("Reply in {{responseLanguage}}: {{text}}")
+
+    expect(user.content).toContain("Reply in Brazilian Portuguese")
+    expect(h.instructions).toContain("Answer in Brazilian Portuguese")
+  })
+
+  it("passes stored surrounding text to the model for both markers and drafts", async () => {
+    marker = {
+      ...MARKER,
+      contextText: `直前の十文字${MARKER.text}直後の十文字`
+    }
+    await run("なぜ？")
+    expect(h.instructions).toContain(`直前の十文字${MARKER.text}直後の十文字`)
+
+    await run("だれ？", {
+      ...DRAFT,
+      contextText: `選択前${DRAFT.text}選択後`
+    })
+    expect(h.instructions).toContain(`選択前${DRAFT.text}選択後`)
   })
 
   it("continues the conversation it was handed rather than looking one up", async () => {

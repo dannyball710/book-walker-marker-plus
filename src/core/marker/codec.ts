@@ -1,5 +1,5 @@
 /**
- * Conversion from the extension's own `BwMarker` into the BOOK☆WALKER wire format
+ * Conversion from the extension's own `BwMarker` into the Book Walker wire format
  * (`RawMarkerItem`), which is what /gm injection hands the viewer to paint.
  */
 import {

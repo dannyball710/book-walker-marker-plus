@@ -8,6 +8,7 @@
 import { joinList, t } from "~/core/i18n"
 
 export type ConfigFieldKind = "text" | "secret" | "url" | "number" | "select"
+export type ProviderOptionsTool = "notion-database"
 
 export interface ConfigFieldOption {
   readonly value: string
@@ -77,6 +78,7 @@ export interface ProviderDescriptor {
   readonly label: string
   readonly fields: readonly ConfigField[]
   readonly docsUrl?: string
+  readonly optionsTool?: ProviderOptionsTool
   /**
    * Empty array means the values are usable. Messages are shown to the user, so they must
    * describe the problem without quoting the offending value.

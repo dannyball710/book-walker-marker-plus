@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest a focused improvement
+title: "[Feature]: "
+labels: []
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the smallest useful behavior and any alternatives considered.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Compatibility and privacy impact
+      description: Note new permissions, provider calls, stored data or reader integration changes.
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Project constraints
+      options:
+        - label: This proposal does not write marker data back to the Book Walker account.
+          required: true
+        - label: I removed credentials, private notes and copyrighted book text.
+          required: true

@@ -65,21 +65,37 @@ function toModelMessage(message: ChatMessage): ModelMessage {
  * A draft carries the passage with it: there is no stored record to read it back from,
  * and it must stay the passage the reader selected even after they select another one.
  */
-async function loadContext(subject: ChatSubject): Promise<PromptVars> {
+type PassageContext = Omit<PromptVars, "responseLanguage">
+
+async function loadContext(subject: ChatSubject): Promise<PassageContext> {
   if (subject.kind === "draft") {
-    return { text: subject.text, memo: subject.memo, bookTitle: subject.bookTitle }
+    return {
+      text: subject.text,
+      memo: subject.memo,
+      bookTitle: subject.bookTitle,
+      ...(subject.contextText === undefined
+        ? {}
+        : { contextText: subject.contextText })
+    }
   }
   const marker = await getMarker(subject.markerId)
   if (!marker) {
     throw new ChatUserError(t("errorMarkerGone"))
   }
-  return { text: marker.text, memo: marker.memo, bookTitle: marker.bookTitle }
+  return {
+    text: marker.text,
+    memo: marker.memo,
+    bookTitle: marker.bookTitle,
+    ...(marker.contextText === undefined
+      ? {}
+      : { contextText: marker.contextText })
+  }
 }
 
 export async function runChatStream(input: ChatStreamInput): Promise<ChatTurn> {
   const context = await loadContext(input.subject)
-
-  const { descriptor, values } = resolveActiveLlm(await getSettings())
+  const settings = await getSettings()
+  const { descriptor, values } = resolveActiveLlm(settings)
   // checked before the question is asked, so a missing grant costs nothing
   await ensureHostPermission({
     label: descriptor.label,
@@ -90,7 +106,10 @@ export async function runChatStream(input: ChatStreamInput): Promise<ChatTurn> {
     id: crypto.randomUUID(),
     role: "user",
     // the expanded text is what the model sees, so it is also what history must keep
-    content: expandPrompt(input.prompt, context),
+    content: expandPrompt(input.prompt, {
+      ...context,
+      responseLanguage: settings.responseLanguage
+    }),
     createdAt: Date.now()
   }
 
@@ -101,7 +120,11 @@ export async function runChatStream(input: ChatStreamInput): Promise<ChatTurn> {
     instructions: buildSystemPrompt({
       bookTitle: context.bookTitle,
       text: context.text,
-      memo: context.memo
+      memo: context.memo,
+      responseLanguage: settings.responseLanguage,
+      ...(context.contextText === undefined
+        ? {}
+        : { contextText: context.contextText })
     }),
     messages: [...input.history, userMessage].map(toModelMessage),
     abortSignal: input.signal,
