@@ -1,3 +1,8 @@
+# @plasmohq/messaging 0.7.2 pins a vulnerable nanoid release. Keep this narrow so PostCSS's
+# separate nanoid 3 dependency stays on its compatible major until messaging updates itself.
+overrides:
+  nanoid@5.1.5: 5.1.16
+
 # Native-binary packages Plasmo's bundler depends on. Left as pnpm's placeholder text they
 # are treated as not-approved, so every install ends in ERR_PNPM_IGNORED_BUILDS and a fresh
 # clone can fail to build.

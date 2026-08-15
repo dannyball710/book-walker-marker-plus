@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  nanoid@5.1.5: 5.1.16
+
 importers:
 
   .:
@@ -32,9 +35,6 @@ importers:
       marked:
         specifier: 16.4.1
         version: 16.4.1
-      plasmo:
-        specifier: 0.90.5
-        version: 0.90.5(@swc/core@1.15.47(@swc/helpers@0.5.23))(@swc/helpers@0.5.23)(@types/node@22.10.2)(postcss@8.5.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -63,6 +63,9 @@ importers:
       fake-indexeddb:
         specifier: ^6.2.5
         version: 6.2.5
+      plasmo:
+        specifier: 0.90.5
+        version: 0.90.5(@swc/core@1.15.47(@swc/helpers@0.5.23))(@swc/helpers@0.5.23)(@types/node@22.10.2)(postcss@8.5.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       postcss:
         specifier: ^8.5.26
         version: 8.5.26
@@ -2819,8 +2822,8 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@5.1.5:
-    resolution: {integrity: sha512-Ir/+ZpE9fDsNH0hQ3C68uyThDXzYcim2EqcZ8zn8Chtt1iylPT9xXJB0kPCnqzgcEGikO9RxSrh63MsmVCU7Fw==}
+  nanoid@5.1.16:
+    resolution: {integrity: sha512-kVrnsrJqMR8+oLJnGEmSWw9BivK5mt7H3FZatVRjrc5wGqFYuBxX1yG7+A7Gi5AefkX6t/oCkizcQgpu0cY1dQ==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -4796,7 +4799,7 @@ snapshots:
 
   '@plasmohq/messaging@0.7.2(react@18.3.1)':
     dependencies:
-      nanoid: 5.1.5
+      nanoid: 5.1.16
     optionalDependencies:
       react: 18.3.1
 
@@ -6405,7 +6408,7 @@ snapshots:
 
   nanoid@3.3.18: {}
 
-  nanoid@5.1.5: {}
+  nanoid@5.1.16: {}
 
   needle@2.9.1:
     dependencies:
