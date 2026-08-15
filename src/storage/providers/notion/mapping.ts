@@ -10,30 +10,13 @@ import {
   type ProfileLocator
 } from "~/core/marker/types"
 import { NotionStoreError } from "~/storage/providers/notion/errors"
+import {
+  PROP,
+  PROP_ALIASES
+} from "~/storage/providers/notion/property-names"
 
 /** Notion rejects a rich_text item longer than this. */
 const RICH_TEXT_CHUNK = 2000
-
-export const PROP = {
-  text: "原文",
-  memo: "備註",
-  bookTitle: "書籍",
-  bookId: "bookId",
-  markerId: "markerId",
-  epubcfi: "epubcfi",
-  capturedProfile: "capturedProfile",
-  file: "file",
-  eFile: "eFile",
-  sidx: "sidx",
-  eidx: "eidx",
-  position: "position",
-  color: "color",
-  progress: "progress",
-  /** every profile's locator as JSON; the flat columns above hold only the captured one */
-  byProfile: "byProfile",
-  createdAt: "createdAt",
-  updatedAt: "updatedAt"
-} as const
 
 interface NotionRichTextValue {
   readonly text: { readonly content: string }
@@ -46,10 +29,8 @@ type NotionPropertyValue =
   | { readonly select: { readonly name: string } }
   | { readonly date: { readonly start: string } }
 
-type NotionPropertyName = (typeof PROP)[keyof typeof PROP]
-
-export type NotionProperties = {
-  readonly [K in NotionPropertyName]: NotionPropertyValue
+export interface NotionProperties {
+  readonly [name: string]: NotionPropertyValue
 }
 
 function toRichText(content: string): readonly NotionRichTextValue[] {
@@ -103,28 +84,68 @@ const richText = z.array(z.object({ plain_text: z.string() }))
 const selectValue = z.object({ name: z.string() }).nullable()
 const dateValue = z.object({ start: z.string() }).nullable()
 
-const notionPageSchema = z.object({
-  id: z.string(),
-  properties: z.object({
-    [PROP.text]: z.object({ title: richText }),
-    [PROP.memo]: z.object({ rich_text: richText }),
-    [PROP.bookTitle]: z.object({ rich_text: richText }),
-    [PROP.bookId]: z.object({ rich_text: richText }),
-    [PROP.markerId]: z.object({ rich_text: richText }),
-    [PROP.epubcfi]: z.object({ rich_text: richText }),
-    [PROP.capturedProfile]: z.object({ select: selectValue }),
-    [PROP.file]: z.object({ rich_text: richText }),
-    [PROP.eFile]: z.object({ rich_text: richText }),
-    [PROP.sidx]: z.object({ number: z.number().nullable() }),
-    [PROP.eidx]: z.object({ number: z.number().nullable() }),
-    [PROP.position]: z.object({ rich_text: richText }),
-    [PROP.color]: z.object({ select: selectValue }),
-    [PROP.progress]: z.object({ number: z.number().nullable() }),
-    [PROP.byProfile]: z.object({ rich_text: richText }),
-    [PROP.createdAt]: z.object({ date: dateValue }),
-    [PROP.updatedAt]: z.object({ date: dateValue })
-  })
+const notionPropertiesSchema = z.object({
+  text: z.object({ title: richText }),
+  memo: z.object({ rich_text: richText }),
+  bookTitle: z.object({ rich_text: richText }),
+  bookId: z.object({ rich_text: richText }),
+  markerId: z.object({ rich_text: richText }),
+  epubcfi: z.object({ rich_text: richText }),
+  capturedProfile: z.object({ select: selectValue }),
+  file: z.object({ rich_text: richText }),
+  eFile: z.object({ rich_text: richText }),
+  sidx: z.object({ number: z.number().nullable() }),
+  eidx: z.object({ number: z.number().nullable() }),
+  position: z.object({ rich_text: richText }),
+  color: z.object({ select: selectValue }),
+  progress: z.object({ number: z.number().nullable() }),
+  byProfile: z.object({ rich_text: richText }),
+  createdAt: z.object({ date: dateValue }),
+  updatedAt: z.object({ date: dateValue })
 })
+
+const rawNotionPageSchema = z.object({
+  id: z.string(),
+  properties: z.record(z.string(), z.unknown())
+})
+
+type NotionPageProps = z.infer<typeof notionPropertiesSchema>
+
+function propertyByAlias(
+  properties: Readonly<Record<string, unknown>>,
+  current: string,
+  aliases: readonly string[]
+): unknown {
+  if (Object.hasOwn(properties, current)) {
+    return properties[current]
+  }
+  for (const alias of aliases) {
+    if (Object.hasOwn(properties, alias)) {
+      return properties[alias]
+    }
+  }
+  return undefined
+}
+
+function parseNotionPage(page: unknown): {
+  readonly id: string
+  readonly properties: NotionPageProps
+} {
+  const raw = rawNotionPageSchema.parse(page)
+  return {
+    id: raw.id,
+    properties: notionPropertiesSchema.parse({
+      ...raw.properties,
+      text: propertyByAlias(raw.properties, PROP.text, PROP_ALIASES.text),
+      memo: propertyByAlias(raw.properties, PROP.memo, PROP_ALIASES.memo),
+      bookTitle: propertyByAlias(
+        raw.properties,
+        PROP.bookTitle,
+        PROP_ALIASES.bookTitle
+      )
+    })
+  }
+}
 
 type NotionColorName = "pink" | "yellow" | "green" | "blue"
 
@@ -252,23 +273,21 @@ function parseStoredMarkerPayload(
   return legacy.success ? { byProfile: knownProfiles(legacy.data) } : null
 }
 
-type NotionPageProps = z.infer<typeof notionPageSchema>["properties"]
-
 /** Rows written before the `byProfile` column: only the captured profile survives. */
 function legacyByProfile(
   props: NotionPageProps,
   profile: FontProfile
 ): { [P in FontProfile]?: ProfileLocator } {
   const byProfile: { [P in FontProfile]?: ProfileLocator } = {}
-  const sFile = plain(props[PROP.file].rich_text)
-  const sidx = props[PROP.sidx].number
-  const eidx = props[PROP.eidx].number
+  const sFile = plain(props.file.rich_text)
+  const sidx = props.sidx.number
+  const eidx = props.eidx.number
   if (sFile === "" || sidx === null || eidx === null) {
     return byProfile
   }
 
-  const eFile = plain(props[PROP.eFile].rich_text)
-  const position = plain(props[PROP.position].rich_text)
+  const eFile = plain(props.eFile.rich_text)
+  const position = plain(props.position.rich_text)
   byProfile[profile] = {
     sFile,
     sidx,
@@ -317,14 +336,14 @@ export function notionPagesToMarkers(
 }
 
 export function notionPageToMarker(page: unknown): BwMarker {
-  const props = notionPageSchema.parse(page).properties
+  const props = parseNotionPage(page).properties
 
-  const id = plain(props[PROP.markerId].rich_text)
+  const id = plain(props.markerId.rich_text)
   if (id === "") {
     throw new NotionStoreError(t("errorNotionRowNotOurs", { prop: PROP.markerId }))
   }
 
-  const colorName = props[PROP.color].select?.name ?? ""
+  const colorName = props.color.select?.name ?? ""
   const color = markerColorFor(colorName)
   if (color === null) {
     throw new NotionStoreError(
@@ -332,7 +351,7 @@ export function notionPageToMarker(page: unknown): BwMarker {
     )
   }
 
-  const profileName = props[PROP.capturedProfile].select?.name ?? ""
+  const profileName = props.capturedProfile.select?.name ?? ""
   if (!isFontProfile(profileName)) {
     throw new NotionStoreError(
       t("errorNotionValueUnknown", {
@@ -343,9 +362,9 @@ export function notionPageToMarker(page: unknown): BwMarker {
     )
   }
 
-  const selectedText = plain(props[PROP.text].title)
+  const selectedText = plain(props.text.title)
   const storedPayload = parseStoredMarkerPayload(
-    plain(props[PROP.byProfile].rich_text),
+    plain(props.byProfile.rich_text),
     selectedText
   )
   const byProfile: { [P in FontProfile]?: ProfileLocator } =
@@ -353,24 +372,24 @@ export function notionPageToMarker(page: unknown): BwMarker {
 
   // Not Date.now(): a missing timestamp would otherwise read differently on every
   // fetch, so anything sorting or comparing by age would flap.
-  const createdAt = toEpochMs(props[PROP.createdAt].date?.start, 0)
+  const createdAt = toEpochMs(props.createdAt.date?.start, 0)
   return {
     id,
-    bookId: plain(props[PROP.bookId].rich_text),
-    bookTitle: plain(props[PROP.bookTitle].rich_text),
+    bookId: plain(props.bookId.rich_text),
+    bookTitle: plain(props.bookTitle.rich_text),
     text: selectedText,
     ...(storedPayload?.contextText === undefined
       ? {}
       : { contextText: storedPayload.contextText }),
-    memo: plain(props[PROP.memo].rich_text),
+    memo: plain(props.memo.rich_text),
     color,
     locator: {
-      epubcfi: plain(props[PROP.epubcfi].rich_text),
+      epubcfi: plain(props.epubcfi.rich_text),
       capturedProfile: profileName,
       byProfile
     },
-    progress: props[PROP.progress].number ?? 0,
+    progress: props.progress.number ?? 0,
     createdAt,
-    updatedAt: toEpochMs(props[PROP.updatedAt].date?.start, createdAt)
+    updatedAt: toEpochMs(props.updatedAt.date?.start, createdAt)
   }
 }

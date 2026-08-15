@@ -4,9 +4,9 @@ import type { NotionDatabaseProperty } from "~/storage/providers/notion/schema"
 import { planNotionSchema } from "~/storage/providers/notion/schema"
 
 const required: readonly NotionDatabaseProperty[] = [
-  { id: "title", name: "原文", type: "title" },
-  { id: "memo", name: "備註", type: "rich_text" },
-  { id: "book-title", name: "書籍", type: "rich_text" },
+  { id: "title", name: "Text", type: "title" },
+  { id: "memo", name: "Note", type: "rich_text" },
+  { id: "book-title", name: "Book", type: "rich_text" },
   { id: "book-id", name: "bookId", type: "rich_text" },
   { id: "marker-id", name: "markerId", type: "rich_text" },
   { id: "cfi", name: "epubcfi", type: "rich_text" },
@@ -32,13 +32,13 @@ describe("planNotionSchema", () => {
   })
 
   it("adds missing properties without claiming data loss", () => {
-    const plan = planNotionSchema(required.filter((property) => property.name !== "備註"))
+    const plan = planNotionSchema(required.filter((property) => property.name !== "Note"))
     expect(plan.status.compatible).toBe(false)
     expect(plan.status.mayDestroyData).toBe(false)
-    expect(plan.properties).toMatchObject({ 備註: { rich_text: {} } })
+    expect(plan.properties).toMatchObject({ Note: { rich_text: {} } })
     expect(plan.status.issues).toContainEqual({
       kind: "missing",
-      property: "備註",
+      property: "Note",
       expected: "rich_text",
       actual: null
     })
@@ -49,26 +49,46 @@ describe("planNotionSchema", () => {
       property.type === "title" ? { ...property, name: "Name" } : property
     )
     const plan = planNotionSchema(properties)
-    expect(plan.properties.title).toEqual({ name: "原文" })
+    expect(plan.properties.title).toEqual({ name: "Text" })
     expect(plan.status.issues).toContainEqual({
       kind: "title_name",
-      property: "原文",
+      property: "Text",
       expected: "title",
       actual: "Name"
     })
   })
 
-  it("deletes a conflicting 原文 before renaming the title", () => {
+  it("deletes a conflicting Text property before renaming the title", () => {
     const properties = [
       ...required.map((property) =>
         property.type === "title" ? { ...property, name: "Name" } : property
       ),
-      { id: "conflict", name: "原文", type: "rich_text" }
+      { id: "conflict", name: "Text", type: "rich_text" }
     ]
     const plan = planNotionSchema(properties)
     expect(plan.properties.conflict).toBeNull()
-    expect(plan.properties.title).toEqual({ name: "原文" })
+    expect(plan.properties.title).toEqual({ name: "Text" })
     expect(plan.status.mayDestroyData).toBe(true)
+  })
+
+  it("renames fields from another locale without destroying their values", () => {
+    const names: Readonly<Record<string, string>> = {
+      Text: "原文",
+      Note: "備註",
+      Book: "書籍"
+    }
+    const localized = required.map((property) => ({
+      ...property,
+      name: names[property.name] ?? property.name
+    }))
+
+    const plan = planNotionSchema(localized)
+
+    expect(plan.status.compatible).toBe(false)
+    expect(plan.status.mayDestroyData).toBe(false)
+    expect(plan.properties.title).toEqual({ name: "Text" })
+    expect(plan.properties.memo).toEqual({ name: "Note" })
+    expect(plan.properties["book-title"]).toEqual({ name: "Book" })
   })
 
   it("changes an incompatible property type and marks the plan destructive", () => {

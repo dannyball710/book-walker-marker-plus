@@ -99,16 +99,19 @@ integration token. The settings page can search shared databases, inspect their 
 after explicit confirmation, create or repair the required properties. Repairing a property
 with the wrong type can destroy data, so review the displayed changes before confirming.
 
-The required Notion properties are:
+The three reader-facing Notion properties follow the extension locale:
 
-`原文 (title)`, `備註 (rich_text)`, `書籍 (rich_text)`, `bookId (rich_text)`,
-`markerId (rich_text)`, `epubcfi (rich_text)`, `capturedProfile (select)`,
-`file (rich_text)`, `eFile (rich_text)`, `sidx (number)`, `eidx (number)`,
-`position (rich_text)`, `byProfile (rich_text)`, `color (select)`, `progress (number)`,
-`createdAt (date)`, `updatedAt (date)`.
+| Locale | Passage (`title`) | Note (`rich_text`) | Book (`rich_text`) |
+| --- | --- | --- | --- |
+| English | `Text` | `Note` | `Book` |
+| Traditional Chinese | `原文` | `備註` | `書籍` |
+| Japanese | `本文` | `メモ` | `書籍` |
 
-The first three names are fixed schema identifiers rather than translated UI text. Changing
-them would make existing databases incompatible.
+The remaining technical properties keep stable names: `bookId`, `markerId`, `epubcfi`,
+`capturedProfile`, `file`, `eFile`, `sidx`, `eidx`, `position`, `byProfile`, `color`,
+`progress`, `createdAt` and `updatedAt`. Rows using any shipped locale remain readable. After
+a browser-language change, the schema tool offers to rename the three reader-facing fields
+to the active locale without changing their types or values.
 
 Storage providers are never synchronized. Switching providers does not move records, and a
 delete affects only the currently selected provider.
@@ -152,7 +155,7 @@ copy `locales/en/messages.json` to `locales/<locale>/` using a Chrome locale cod
 translate the messages. The test suite checks that keys and placeholders remain aligned.
 
 Functional Japanese and Chinese strings also appear in tests, the Book Walker button matcher
-and the fixed Notion schema. They are deliberate compatibility fixtures, not untranslated
+and localized Notion schema compatibility fixtures. They are deliberate, not untranslated
 source comments.
 
 ## Privacy and security

@@ -1,8 +1,9 @@
 import * as z from "zod"
 
-import { t } from "~/core/i18n"
+import { joinList, t } from "~/core/i18n"
 import { createConfigCodec } from "~/core/provider/config"
 import type { ConfigField } from "~/core/provider/descriptor"
+import { PROP } from "~/storage/providers/notion/property-names"
 
 export interface NotionConfig {
   readonly pat: string
@@ -12,8 +13,25 @@ export interface NotionConfig {
 export const NOTION_LABEL = "Notion"
 
 /** Every column the mapper reads; a missing one fails validation on the first query. */
-const REQUIRED_COLUMNS =
-  "原文 (title)、備註 (rich_text)、書籍 (rich_text)、bookId (rich_text)、markerId (rich_text)、epubcfi (rich_text)、capturedProfile (select)、file (rich_text)、eFile (rich_text)、sidx (number)、eidx (number)、position (rich_text)、byProfile (rich_text)、color (select)、progress (number)、createdAt (date)、updatedAt (date)"
+const REQUIRED_COLUMNS = joinList([
+  `${PROP.text} (title)`,
+  `${PROP.memo} (rich_text)`,
+  `${PROP.bookTitle} (rich_text)`,
+  `${PROP.bookId} (rich_text)`,
+  `${PROP.markerId} (rich_text)`,
+  `${PROP.epubcfi} (rich_text)`,
+  `${PROP.capturedProfile} (select)`,
+  `${PROP.file} (rich_text)`,
+  `${PROP.eFile} (rich_text)`,
+  `${PROP.sidx} (number)`,
+  `${PROP.eidx} (number)`,
+  `${PROP.position} (rich_text)`,
+  `${PROP.byProfile} (rich_text)`,
+  `${PROP.color} (select)`,
+  `${PROP.progress} (number)`,
+  `${PROP.createdAt} (date)`,
+  `${PROP.updatedAt} (date)`
+])
 
 export const notionFields: readonly ConfigField[] = [
   {

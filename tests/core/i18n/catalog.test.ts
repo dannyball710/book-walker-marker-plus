@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest"
 import * as z from "zod"
 
 import { joinList, t } from "~/core/i18n"
+import { PROP_ALIASES } from "~/storage/providers/notion/property-names"
 
 const entrySchema = z.object({
   message: z.string(),
@@ -51,6 +52,21 @@ describe("locale catalogues", () => {
           placeholderSlots(entry)
         )
       }
+    }
+  )
+
+  it.each([{ locale: "en", catalogue: base }, ...translations])(
+    "$locale keeps its Notion property names in the compatibility aliases",
+    ({ catalogue }) => {
+      expect(PROP_ALIASES.text).toContain(
+        catalogue.notionPropertyTextName?.message
+      )
+      expect(PROP_ALIASES.memo).toContain(
+        catalogue.notionPropertyMemoName?.message
+      )
+      expect(PROP_ALIASES.bookTitle).toContain(
+        catalogue.notionPropertyBookName?.message
+      )
     }
   )
 

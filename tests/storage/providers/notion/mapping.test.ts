@@ -8,6 +8,7 @@ import {
   notionPagesToMarkers,
   notionPageToMarker
 } from "~/storage/providers/notion/mapping"
+import { PROP } from "~/storage/providers/notion/property-names"
 
 const marker: BwMarker = {
   id: "11111111-2222-3333-4444-555555555555",
@@ -65,9 +66,32 @@ function withProperty(page: unknown, name: string, value: unknown): unknown {
   return { ...parsed, properties: { ...parsed.properties, [name]: value } }
 }
 
+function renameProperty(page: unknown, from: string, to: string): unknown {
+  const parsed = apiPageSchema.parse(page)
+  const entries = Object.entries(parsed.properties).filter(([name]) => name !== from)
+  return {
+    ...parsed,
+    properties: { ...Object.fromEntries(entries), [to]: parsed.properties[from] }
+  }
+}
+
 describe("notion property mapping", () => {
   it("round-trips a marker without losing any field", () => {
     expect(notionPageToMarker(asApiPage(marker))).toEqual(marker)
+  })
+
+  it("reads rows created under another interface locale", () => {
+    const chinese = renameProperty(
+      renameProperty(
+        renameProperty(asApiPage(marker), PROP.text, "原文"),
+        PROP.memo,
+        "備註"
+      ),
+      PROP.bookTitle,
+      "書籍"
+    )
+
+    expect(notionPageToMarker(chinese)).toEqual(marker)
   })
 
   it("stores a comma-free Notion select name for the marker colour", () => {
@@ -154,9 +178,9 @@ describe("notion property mapping", () => {
 
   it("splits text past the rich_text limit and rejoins it on read", () => {
     const long = { ...marker, text: "あ".repeat(4500) }
-    const title = markerToNotionProperties(long)["原文"]
+    const title = markerToNotionProperties(long)[PROP.text]
 
-    expect("title" in title && title.title.length).toBe(3)
+    expect(title !== undefined && "title" in title && title.title.length).toBe(3)
     expect(notionPageToMarker(asApiPage(long)).text).toBe(long.text)
   })
 

@@ -297,6 +297,9 @@
   },
 
   "storageIdbLabel": { "message": "This device (IndexedDB)" },
+  "notionPropertyTextName": { "message": "Text" },
+  "notionPropertyMemoName": { "message": "Note" },
+  "notionPropertyBookName": { "message": "Book" },
   "notionPatLabel": { "message": "Integration token" },
   "notionDatabaseFieldLabel": { "message": "Database" },
   "notionDatabasePickerTitle": { "message": "Choose a database" },
@@ -325,7 +328,7 @@
     }
   },
   "notionSchemaTitleRename": {
-    "message": "Rename title field “$current$” to “$property$”",
+    "message": "Rename field “$current$” to “$property$”",
     "placeholders": {
       "current": { "content": "$1" },
       "property": { "content": "$2" }
