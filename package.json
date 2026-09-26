@@ -24,30 +24,30 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@ai-sdk/google": "4.0.44",
-    "@ai-sdk/openai": "4.0.41",
-    "@ai-sdk/provider-utils": "5.0.27",
-    "@openrouter/ai-sdk-provider": "3.0.0",
+    "@ai-sdk/google": "4.0.78",
+    "@ai-sdk/openai": "4.0.73",
+    "@ai-sdk/provider-utils": "5.0.46",
+    "@openrouter/ai-sdk-provider": "3.1.0",
     "@plasmohq/messaging": "0.7.2",
-    "ai": "7.0.65",
+    "ai": "7.0.112",
     "idb": "8.0.3",
-    "marked": "16.4.1",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "zod": "4.4.3"
+    "marked": "18.0.14",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "4.6.5"
   },
   "devDependencies": {
-    "@types/chrome": "0.0.287",
-    "@types/node": "22.10.2",
-    "@types/react": "18.3.12",
-    "@types/react-dom": "18.3.1",
-    "autoprefixer": "^10.5.4",
+    "@types/chrome": "0.3.0",
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "autoprefixer": "^10.6.1",
     "fake-indexeddb": "^6.2.5",
-    "postcss": "^8.5.26",
+    "postcss": "^8.5.28",
     "plasmo": "0.90.5",
-    "tailwindcss": "^3.4.19",
-    "typescript": "5.9.3",
-    "vitest": "4.1.10"
+    "tailwindcss": "^4.3.3",
+    "typescript": "7.0.2",
+    "vitest": "5.0.1"
   },
   "manifest": {
     "default_locale": "en",
